@@ -2,56 +2,71 @@
 
 from dataio import *
 from lslft_recon import *
+import cmd_parse as cmdp
+import cfg_parse as cfgp
 
 def main():
     '''Given the position of transit to window (given by tran,tran[0]=ts, tran[1]=te) and do a better fit for the base line\n
 	  Only use when reprocess the selected lightcurves, apply for a short baseline with one deep known transit\n
 	  It is a useful thing to do before the kepfit_simple.sh
 	  Warning: the output file does not containing the full information of the inputfile, only 2 columns with BJD and detrended flux. The replaceflag is default off to prevent unwantted replace of files. '''
-
+    
+    options = cmdp.ltf_parse()
+    infileflag = options.infileflag
+    inpathflag = options.inpathflag
+    noplot=options.noplot
+    outpathflag = options.outpathflag
+    cfgfile = options.cfg
+    uflag = options.uflag
     infile = 'test.txt'
     outfile = 'test_recon.txt'
-    coljd = 1
-    colmag = 4
+    
+    if(infileflag):
+        infile = cfgp.ltf_parse(cfgfile,'infile')
+    else:
+        infile = options.infile
+
+    if(inpathflag):
+        inpath = cfgp.ltf_parse(cfgfile,'inpath')
+    else:
+        inpath = options.inpath
+
+    outfile = cfgp.ltf_parse(cfgfile,'outfile')
+    
+    coljd = 1; colmag = 2 
+    tmin=1.0
+    if(uflag):
+        coljd = int(cfgp.ltf_parse(cfgfile,'coljd'))
+        colmag = int(cfgp.ltf_parse(cfgfile,'colmag'))
+        tmin = float(cfgp.ltf_parse(cfgfile,'tmin'))
+         
+    period = float(cfgp.ltf_parse(cfgfile,'period'))
+    epoch = float(cfgp.ltf_parse(cfgfile,'epoch'))
+    Tdur = float(cfgp.ltf_parse(cfgfile,'tdur'))
+    
     time=[]
     mag=[]
-    #n=60
-    #tmin=10.0
-    tmin=0.2
-    qn=1
-    P = 125.6306458; epoch = 1086.33958; Tdur = 9.0432; q = Tdur/P/24.
-    readcolumn(time,coljd,infile)
-    readcolumn(mag,colmag,infile)
-    time=np.array(time)
-    mag=np.array(mag)
-    print len(time),len(mag),max(time),min(time)
-    intran = gentran(time,P,epoch,q)
+    q = Tdur/period/24.
+    readcolumn(time,coljd,infile);time=np.array(time)
+    readcolumn(mag,colmag,infile);mag=np.array(mag)
+    #print len(time),len(mag),max(time),min(time)
+    intran = gentran(time,period,epoch,q)
     #dip = np.mean(mag[intran])-np.mean(mag[-intran])
     #dip = 0.00775
-    dip = 0.07871**2. 
-    if(dip<0):
-        dip=0.01
-    #print mag[intran]
-    print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
-    #time-=2454000
+  
+    #print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
+    
     n=round((max(time)-min(time))/tmin)
-    #tran = np.zeros(len(time))
-    #intran = (1719.82<time)*(time<1720.08)
-    #intran = (2086.46<time)*(time<2086.79)
-    #print time[intran]
-    #print len(time[intran])
-    #dflux=lsfitrecon(time,mag,intran,n=n,qn=qn,wn=7,dipguess=dip)
-    dflux=lssubrecon(time,mag,intran,n=n,qn=qn,wn=7)
+
+    dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
     dflux=dflux+(min(mag)-np.median(dflux))
-    if((not os.path.exists(outfile)) or replace):	
-        fout=open(outfile,mode='w')
-        for i in range(len(time)):
-            #line='%10.6f %10.6f\n' % (time[i]+2454000,dflux[i])
-            line='%10.6f %10.6f\n' % (time[i],dflux[i])
-            fout.write(line)
-        fout.close()
-    else:
-        print '%s already exists, turn replaceflag on if want to replace it' % (outfile)
+    
+    fout=open(outfile,mode='w')
+    for i in range(len(time)):
+        line='%10.6f %10.6f\n' % (time[i],dflux[i])
+        fout.write(line)
+    fout.close()
+    
     return	
 	
 if __name__=='__main__':

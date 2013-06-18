@@ -31,7 +31,7 @@ def gentran(time,period,epoch,q):
     return intran
 
 
-def lssubrecon(otime,oflux,intran,n=30,qn=0,wn=21,noplot=True):
+def lssubrecon(otime,oflux,intran,n=30,noplot=True):
     length=len(oflux)
     ctime = otime[-intran]
     cflux = oflux[-intran]-np.mean(oflux[-intran]) 
@@ -40,21 +40,22 @@ def lssubrecon(otime,oflux,intran,n=30,qn=0,wn=21,noplot=True):
     cflux -=(k*ctime+b)
     E0=min(ctime)	
     T=max(ctime)-min(ctime)
-    print E0,len(cflux),len(ctime)
+    #print E0,len(cflux),len(ctime)
     A=matrixgen(ctime-E0,n,T)
-    print A.shape,n
-    fig=plt.figure()
-    ax = fig.add_subplot(1,1,1)
+    #print A.shape,n
     c,resid,rank,sigma = linalg.lstsq(A,cflux)
-    print resid	
+    #print resid	
     rflux=sp.zeros(len(otime))	
     e=np.rollaxis(np.sin(np.array(np.r_['c',0:n]*(otime[np.arange(length)]-E0))*math.pi/T),1,0)
     rflux=np.dot(e,c)
     eflux = k*otime+b
-    print rflux.shape,eflux.shape 
+    #print rflux.shape,eflux.shape 
     rflux+=eflux
-    ax.plot(otime,rflux,'.',otime,eflux,'+',ctime,cflux,'x')
-    plt.show()
+    if(not noplot):
+        fig=plt.figure()
+        ax = fig.add_subplot(1,1,1)
+        ax.plot(otime,rflux,'.',otime,eflux,'+',ctime,cflux,'x')
+        plt.show()
     	
     dflux=oflux-rflux+np.mean(oflux)
     
@@ -81,7 +82,7 @@ def tranfunc(c,ctime,intran,T):
     rflux-=np.mean(rflux)
     return rflux
 
-def lsfitrecon(otime,oflux,intran,n=30,qn=0,wn=21,noplot=True,dipguess=0.0001):
+def lsfitrecon(otime,oflux,intran,n=30,noplot=True,dipguess=0.0001):
 
     length=len(oflux)
     
@@ -99,8 +100,7 @@ def lsfitrecon(otime,oflux,intran,n=30,qn=0,wn=21,noplot=True,dipguess=0.0001):
     tran = sp.zeros(len(ctime))
     tran[intran]+=c[n]
     tran-=np.mean(tran)
-    print c[n],len(tran[intran])
-    noplot=False
+    #print c[n],len(tran[intran])
     if(not noplot):
         fig=plt.figure()
         ax = fig.add_subplot(1,1,1)
