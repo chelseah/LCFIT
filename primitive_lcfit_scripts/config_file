@@ -1,0 +1,37 @@
+INPUT_LC data/lc.dat
+
+LC_LD1 [0.242]
+LC_LD1_ERR [0.1]
+LC_LD2 [0.289]
+LC_LD2_ERR [0.1]
+
+PERIOD 110.321604
+PERIOD_ERR 0.0
+
+T0 1030.3644799999893
+T0_ERR 0.005
+
+RSUM 0.019
+RSUM_ERR 0.01
+
+RRATIO 0.08
+RRATIO_ERR 0.01
+
+I0 89.38
+I0_ERR 1.0
+
+ECOSW 0.00
+ECOSW_ERR 0.00
+
+ESINW 0.00
+ESINW_ERR 0.00
+
+########## Fitting options
+
+WALKERS 100 ### Number of MCMC walkers
+NBURN 100 ### Number of burn runs
+MCMC 500000 ### Number of iterations for MCMC
+
+RUN_DOWNHILL false ### Run downhill simples
+RUN_MCMC true ### Run MCMC method
+
