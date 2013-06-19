@@ -9,8 +9,6 @@ def set_parse(infile):
     p = ConfigParser.RawConfigParser()
 ###################### Configuration parameter for Longtrendfilter ###########
     p.add_section('Section LTF')
-    p.set('Section LTF','s0','1') #the start sgn number
-    p.set('Section LTF','se','84') #the end sgn number
     p.set('Section LTF','inpath','')
     p.set('Section LTF','infile','')
     p.set('Section LTF','inlist','')
