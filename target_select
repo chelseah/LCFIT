@@ -8,7 +8,7 @@
 #5652983	498.393000	244.080 0 #two transits @ too big, false positive
 6462863	22.343000	132.740 #13 transits
 6471021	125.631000	253.340 0 #two transits @uploaded, fitted by G, not seen
-6603043	110.322000	197.364 0 #two transits @ fitted independently by G and C , not see anything
+6603043	110.322000	197.364 0 #two transits @uploaded, fitted independently by G and C , not see anything
 6607447	99.643600	283.237 #one transits @uploaded
 7277317	16.339000	177.916 3 #10 transits
 7906882	52.513600	171.674 2 #1 transits @uploaded
@@ -17,6 +17,6 @@
 8845026	66.467700	160.474 1 #6 transit varing
 9846348	26.893100	179.953 2 #1 transit @uploaded
 11442793	331.643000	140.477 #multiple; the 331.64 day is not caught in SC, 
-                                #the 210day has two transit, uploaded
+                                #the 210day has two transit, @uploaded
 #11446443	2.470610	122.763
-12365184	69.733000	196.063 1 #9 transit but variable
+12365184	69.733000	196.063 1 #9 transit but variable @uploaded
