@@ -7,7 +7,7 @@
 %init %{
 import_array();
 %}
-
+%apply(double * INPLACE_ARRAY1, int DIM1){(double *phi, int np), (double *deficitFlux, int nf)};
 %{
 #include "oblateness.h"
 %}

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from distutil.core import *
+from distutils.core import *
 from distutils import sysconfig
 from distutils.extension import Extension
 
@@ -14,9 +14,9 @@ _oblateness = Extension("_oblateness",
         )
 
 setup(name="Oblate",
-        description = "model for an oblate planet"
-        author = "Wei Zhu, Xu Huang"
-        author_email = ""
+        description = "model for an oblate planet",
+        author = "Wei Zhu, Xu Huang",
+        author_email = "",
         url = "",
         version = "0.0.0",
         py_modules = ["oblateness"],
