@@ -13,3 +13,4 @@ import_array();
 %}
 
 %include "oblateness.h"
+%clean (double *phi, int np), (double *deficitFlux, int nf);
