@@ -1,15 +1,15 @@
 #include"oblateness.h"
-#define IA 16807
-#define IM 2147483647
-#define AM (1.0/IM)
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
-#define NDIV (1+(IM-1)/NTAB)
-#define EPS 1.2e-7
-#define RNMX (1.0 - EPS)
 
-float ran1(long *idum)
+Oblateness::Oblateness(double Req, double Rpole, double alpha, double sma, double inc, double u1, double u2):Req_(Req),Rpole_(Rpole),alpha_(alpha),sma_(sma),inc_(inc),u1_(u1),u2_(u2){
+  AM=1.0/IM;
+  NDIV=(1+(IM-1)/NTAB);
+  EPS=1.2e-7;
+  RNMX= (1.0 - EPS);
+}
+Oblateness::~Oblateness(){
+}
+
+double Oblateness::Ran1_(long *idum)
 {
   int j;
   long k;
@@ -41,14 +41,14 @@ float ran1(long *idum)
 static long seed=0;
 
 /* limb darkening function */
-double limbDarkening(double u1, double u2, double r2)
+double Oblateness::LimbDarkening_(double r2)
 {
 	double t = 1-r2;
-	return((u1+2*u2)*sqrt(t)-u2*t);
+	return((u1_+2*u2_)*sqrt(t)-u2_*t);
 }
 
 /* find the intersection point on the line (x1,y1) to (x2,y2) */
-void findRoot(double x1, double y1, double x2, double y2, double xc, double yc, double *xval, double *yval, int *flag)
+void Oblateness::FindRoot_(double x1, double y1, double x2, double y2, double xc, double yc, double *xval, double *yval, int *flag)
 {
 	double d1, d2, d;
 	d1 = (x1-xc)*(x1-xc)+(y1-yc)*(y1-yc)-1;
@@ -82,7 +82,7 @@ void findRoot(double x1, double y1, double x2, double y2, double xc, double yc, 
 }
 
 /* find the intersection points on the ellipse */
-void intersectionPoints(double *x, double *y, int *n, double a, double b, double xc, double yc)
+void Oblateness::IntersectionPoints_(double *x, double *y, int *n, double a, double b, double xc, double yc)
 {
 	int N=500, i, count=0;
 	double phi1, phi2, dphi=2*pi/N;
@@ -94,7 +94,7 @@ void intersectionPoints(double *x, double *y, int *n, double a, double b, double
 		phi1 = i*dphi; phi2 = (i+1)*dphi;
 		x1 = a*cos(phi1); x2 = a*cos(phi2);
 		y1 = b*sin(phi1); y2 = b*sin(phi2);
-		findRoot(x1, y1, x2, y2, xc, yc, &xval, &yval, &flag);
+		FindRoot_(x1, y1, x2, y2, xc, yc, &xval, &yval, &flag);
 		if(flag == 0) continue;
 		if(count > 1) {printf("More intersection points than expected!\n"); exit(1);}
 		x[count] = xval; y[count] = yval; count++;
@@ -105,7 +105,7 @@ void intersectionPoints(double *x, double *y, int *n, double a, double b, double
 }
 
 /* area calculation */
-double triangleArea(double *x, double *y)
+double Oblateness::TriangleArea_(double *x, double *y)
 {
 	double dx = x[1]-x[0];
 	double dy = y[1]-y[0];
@@ -120,7 +120,7 @@ double triangleArea(double *x, double *y)
 	return(area);
 }
 
-double circleChordArea(double *x, double *y, double xc, double yc, double rc)
+double Oblateness::CircleChordArea_(double *x, double *y, double xc, double yc, double rc)
 {
 	double x1=x[0]-xc, y1=y[0]-yc;
 	double x2=x[1]-xc, y2=y[1]-yc;
@@ -136,7 +136,8 @@ double circleChordArea(double *x, double *y, double xc, double yc, double rc)
 }
 
 /* calculate the deficite flux of the star at phase phi */
-void relativeFlux(double *variables, int n, double phi, double *deficitFlux, double *circleAnalogy)
+void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
+//void relativeFlux(double *variables, int n, double phi, double *deficitFlux, double *circleAnalogy)
 {
 	/* variables */
 /*  variables[0] = Req;
@@ -151,125 +152,132 @@ void relativeFlux(double *variables, int n, double phi, double *deficitFlux, dou
 	variables[9] = percentage; phase interval
 */
 	double rc=1.0;
+  double *d = new double [np];
+  for (int i=0;i<np;i++){
 	/* distance between centers of the planet and the star */
-	double d=variables[3]*sqrt(sin(phi*2*pi)*sin(phi*2*pi)+cos(phi*2*pi)*cos(phi*2*pi)*cos(variables[5])*cos(variables[5]));
+	  d[i]=sma_*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
 	
-	/* the embedded sphere's contribution */
-	//*circleAnalogy = standardCurve(variables[1], d, variables[6], variables[7]);
+	  /* the embedded sphere's contribution */
+	  //*circleAnalogy = standardCurve(variables[1], d, variables[6], variables[7]);
 
-
-	/* if no transit happens */
-	if(d >= (1.0+variables[0]))	{ *deficitFlux = 0.0; return; }
+	  /* if no transit happens */
+	  if(d[i] >= (1.0+Req_)){ 
+      deficitFlux[i] = 0.0;
+      continue;
+    }
 	
-	/* angle between the major axis and the line connecting two centers */
-	double beta;
-	double b0=variables[3]*cos(variables[5]);
-	if(phi<=0) beta = variables[2]+asin(b0/d); /* ingress */
-	if(phi>0)  beta = variables[2]-pi-asin(b0/d); /* egress */
+	  /* angle between the major axis and the line connecting two centers */
+	  double beta;
+	  double b0=sma_*cos(inc_);
+	  if(phi[i]<=0) beta = alpha_+asin(b0/d[i]); /* ingress */
+	  if(phi[i]>0)  beta = alpha_-pi-asin(b0/d[i]); /* egress */
 
-	/* star's position and intersection points */
-	double xc, yc;
-	xc = d*cos(beta);
-	yc = d*sin(beta);
-	double xinter[2], yinter[2];
-	int npoints;
-	intersectionPoints(xinter, yinter, &npoints, variables[0], variables[1], xc, yc);
+	    /* star's position and intersection points */
+	  double xc, yc;
+	  xc = d[i]*cos(beta);
+	  yc = d[i]*sin(beta);
+	  double xinter[2], yinter[2];
+	  int npoints;
+	  IntersectionPoints_(xinter, yinter, &npoints, Req_, Rpole_, xc, yc);
 	
-	if(d>1.0 && npoints<2) { /* the planet is outside the stellar plane, and there is no intersectiosn */
-		*deficitFlux = 0.0;
-		return;
-	}
+	  if(d[i]>1.0 && npoints<2) { /* the planet is outside the stellar plane, and there is no intersectiosn */
+		  deficitFlux[i] = 0.0;
+      continue;
+	  }
 
-	/* calculate the limitation region */
-	double theta1, theta2, t;
-	double F00; /* F(x;a,b,alpha,0,0)-F(x;b,0,0) */
-	if(d<1.0 && npoints<2) { /* the planet is inside the stellar plane and there is no intersections */
+	  /* calculate the limitation region */
+	  double theta1, theta2, t;
+	  double F00; /* F(x;a,b,alpha,0,0)-F(x;b,0,0) */
+	  if(d[i]<1.0 && npoints<2) { /* the planet is inside the stellar plane and there is no intersections */
 		theta1 = 0.0;
 		theta2 = 2*pi;
-		F00 = pi*variables[1]*(variables[0]-variables[1]);
-	}
-	if(npoints==2) { /* two intersections */
-		if(yinter[0] >= 0)
-	  		theta1 = acos(xinter[0]/variables[0]);
-		else
-	  		theta1 = 2*pi-acos(xinter[0]/variables[0]);
-		if(yinter[1] >= 0)
-	  		theta2 = acos(xinter[1]/variables[0]);
-		else
-	  		theta2 = 2*pi-acos(xinter[1]/variables[0]);
-		if(theta1 > theta2){
-			t = theta1;
-			theta1 = theta2;
-			theta2 = t;
-		}
-	}
+		F00 = pi*Rpole_*(Req_-Rpole_);
+	  }
+	  if(npoints==2) { /* two intersections */
+		  if(yinter[0] >= 0)
+	  		theta1 = acos(xinter[0]/Req_);
+		  else
+	  		theta1 = 2*pi-acos(xinter[0]/Req_);
+		  if(yinter[1] >= 0)
+	  		theta2 = acos(xinter[1]/Req_);
+		  else
+	  		theta2 = 2*pi-acos(xinter[1]/Req_);
+		  if(theta1 > theta2){
+			  t = theta1;
+			  theta1 = theta2;
+			  theta2 = t;
+		  }
+	  }
 
-	double theta0 = (theta1+theta2)*0.5;
-	double xtest, ytest;
-	xtest = variables[0]*cos(theta0);
-	ytest = variables[1]*sin(theta0);
-	double dtest;
-	dtest = (xtest-xc)*(xtest-xc)+(ytest-yc)*(ytest-yc)-1.0;
-	if(dtest>0) {
-		t = theta2-2*pi;
-		theta2 = theta1;
-		theta1 = t;
-	}
+	  double theta0 = (theta1+theta2)*0.5;
+	  double xtest, ytest;
+	  xtest = Req_*cos(theta0);
+	  ytest = Rpole_*sin(theta0);
+	  double dtest;
+	  dtest = (xtest-xc)*(xtest-xc)+(ytest-yc)*(ytest-yc)-1.0;
+	  if(dtest>0) {
+		  t = theta2-2*pi;
+		  theta2 = theta1;
+		  theta1 = t;
+	  }
 
-	double epsilon = variables[0]/variables[1];
-	double epsilon2 = epsilon*epsilon;
-	double chordArea1, chordArea2;
-	double dtheta=theta2-theta1;
-	double ksi, psi, cc, p2;
-	if(npoints == 2) {
-		if(dtheta<=pi)
-		  chordArea1 = dtheta*variables[0]*variables[1]*0.5-triangleArea(xinter, yinter);
-		else
-		  chordArea1 = dtheta*variables[0]*variables[1]*0.5+triangleArea(xinter, yinter);
-		chordArea2 = circleChordArea(xinter, yinter, xc, yc, 1.0);
+	  double epsilon = Req_/Rpole_;
+	  double epsilon2 = epsilon*epsilon;
+	  double chordArea1, chordArea2;
+	  double dtheta=theta2-theta1;
+	  double ksi, psi, cc, p2;
+	  if(npoints == 2) {
+		  if(dtheta<=pi){
+		    chordArea1 = dtheta*Req_*Rpole_*0.5-TriangleArea_(xinter, yinter);
+      }else{
+		    chordArea1 = dtheta*Req_*Rpole_*0.5+TriangleArea_(xinter, yinter);
+      }
+		  chordArea2 = CircleChordArea_(xinter, yinter, xc, yc, 1.0);
+		  if(d[i]>=(Rpole_+1.0)) /* the two circles are separated */
+      {
+		    F00 = chordArea1+chordArea2;
+      } else if(d[i]>(1.0-Rpole_)) { /* the two circles have intersection points */
+			  ksi = acos((Rpole_*Rpole_+d[i]*d[i]-1.0)/(2*Rpole_*d[i]));
+			  psi = acos((1.0+d[i]*d[i]-Rpole_*Rpole_)/(2.0*d[i]));
+			  p2 = Rpole_*Rpole_;
+			  cc = ksi*p2+psi-sqrt(4*d[i]*d[i]-(1+d[i]*d[i]-p2)*(1+d[i]*d[i]-p2))*0.5;
+			  F00 = chordArea1+chordArea2-cc;
+		  } else /* the small circle is included in the larger one */{
+		    F00 = chordArea1+chordArea2-pi*Rpole_*Rpole_;
+      }
+	  }
 
-		if(d>=(variables[1]+1.0)) /* the two circles are separated */
-		  F00 = chordArea1+chordArea2;
-		else if(d>(1.0-variables[1])) { /* the two circles have intersection points */
-			ksi = acos((variables[1]*variables[1]+d*d-1.0)/(2*variables[1]*d));
-			psi = acos((1.0+d*d-variables[1]*variables[1])/(2.0*d));
-			p2 = variables[1]*variables[1];
-			cc = ksi*p2+psi-sqrt(4*d*d-(1+d*d-p2)*(1+d*d-p2))*0.5;
-			F00 = chordArea1+chordArea2-cc;
-		}
-		else /* the small circle is included in the larger one */
-		  F00 = chordArea1+chordArea2-pi*variables[1]*variables[1];
-	}
-
-	int Nrays, i;
-	Nrays = 3000;
-	double eta1, eta2, theta, R, x, y;
-	double contribution=0.0, separation1, separation2;
-	double total=0.0;
+	  int Nrays;
+	  Nrays = 3000;
+	  double eta1, eta2, theta, R, x, y;
+	  double contribution=0.0, separation1, separation2;
+	  double total=0.0;
 	
-	for(i=1; i<=Nrays; i++)
-	{
-		eta1 = ran1(&seed);
-		eta2 = ran1(&seed);
-		theta = (1.0-eta2)*theta1+eta2*theta2;
-		R = sqrt(eta1+(1-eta1)/epsilon2);
-		x = variables[0]*R*cos(theta);
-		y = variables[1]*R*sin(theta);
-		/* distance to the center of the star */
-		separation1 = (x-xc)*(x-xc)+(y-yc)*(y-yc);
-		/* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
-		if(separation1 > 1.0) continue;
-		/* distance to the center of the planet */
-		separation2 = x*x+y*y;
-		if(separation2 < variables[1]*variables[1]) continue;
-		/* otherwise, add its contribution on */
-		contribution += limbDarkening(variables[6], variables[7], separation1);
-	}
+	  for(int j=1; j<=Nrays; j++)
+	  {
+		  eta1 = Ran1_(&seed);
+		  eta2 = Ran1_(&seed);
+		  theta = (1.0-eta2)*theta1+eta2*theta2;
+		  R = sqrt(eta1+(1-eta1)/epsilon2);
+		  x = Req_*R*cos(theta);
+		  y = Rpole_*R*sin(theta);
+		  /* distance to the center of the star */
+		  separation1 = (x-xc)*(x-xc)+(y-yc)*(y-yc);
+		  /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
+		  if(separation1 > 1.0) continue;
+		  /* distance to the center of the planet */
+		  separation2 = x*x+y*y;
+		  if(separation2 < Rpole_*Rpole_) continue;
+		  /* otherwise, add its contribution on */
+		  contribution += LimbDarkening_(separation1);
+	  }
 	
-	double totalArea, Istar;
-	totalArea = dtheta*(variables[0]*variables[0]-variables[1]*variables[1])*0.5/epsilon;
-	Istar = contribution*totalArea/Nrays;
-	*deficitFlux = (1.0-variables[6]-variables[7])*F00+Istar;
+	  double totalArea, Istar;
+	  totalArea = dtheta*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
+	  Istar = contribution*totalArea/Nrays;
+	  deficitFlux[i] = (1.0-u1_-u2_)*F00+Istar;
+  }
+  delete [] d;
 }
 
 

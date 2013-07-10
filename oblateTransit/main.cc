@@ -1,7 +1,7 @@
 #include "oblateness.h"
 int main()
 {
-	double variables[10];
+  double variables[10];
 	double rmean;
 	double f;
 	double alpha, sma, period, inc, u1, u2;
@@ -34,8 +34,7 @@ int main()
 
 	double req = variables[0]/sqrt(1-variables[1]); //Req
 	double rpol = sqrt(1-variables[1])*variables[0]; //Rpole
-	variables[0] = req;
-	variables[1] = rpol;
+	Oblateness obl = Oblateness(req,rpol,alpha,sma,inc,u1,u1);
 
 	double b0 = sma*cos(variables[5]); //inpact parameter
 	if(b0>(1+req))
@@ -44,26 +43,25 @@ int main()
 		exit(1);
 	}
 	double dphi = 2*percent/(variables[8]-1);
-	double phi;
-	double totalFlux, deficitFlux, amp, circleAnalogy;
+	double* phi = new double [N];
+  double* deficitFlux = new double [N];
+	double totalFlux,  amp, circleAnalogy;
 	FILE *lc;
-
-	for(i=0;i<10;i++)
-	  printf("%d %f\n", i, variables[i]);
-	printf("\n");
 
 	if(fabs(f)<1e-3)
 	  lc = fopen("limbDarkenedLC-mean.dat", "w");
 	else
 	  lc = fopen("limbDarkenedLC.dat", "w");
 	totalFlux = pi*(1.0-variables[6]/3-variables[7]/6);
-	for(phi=-1*percent; phi<percent; phi+=dphi)
-	{
+  for(int i =0;i<N;i++){
+    phi[i]=-1*percent+dphi*i;
+  }
 		/* functions to calculate the relative flux at this moment */
-		relativeFlux(variables, n, phi, &deficitFlux, &circleAnalogy);
+	obl.relativeFlux(phi,N, deficitFlux, N);
 		//amp = circleAnalogy-deficitFlux/totalFlux;
-    amp = deficitFlux/totalFlux;
-		fprintf(lc, "%f %f\n", phi, amp);
+  for(int i =0;i<N;i++){
+    amp = deficitFlux[i]/totalFlux;
+		fprintf(lc, "%f %f\n", phi[i], amp);
 	}
 	fclose(fp);
 	fclose(lc);
