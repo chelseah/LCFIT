@@ -13,9 +13,9 @@ def main():
     
     options = cmdp.ltf_parse()
     infileflag = options.infileflag
+    outfileflag = options.outfileflag
     inpathflag = options.inpathflag
     noplot=options.noplot
-    outpathflag = options.outpathflag
     cfgfile = options.cfg
     uflag = options.uflag
     infile = 'test.txt'
@@ -30,8 +30,10 @@ def main():
         inpath = cfgp.ltf_parse(cfgfile,'inpath')
     else:
         inpath = options.inpath
-
-    outfile = cfgp.ltf_parse(cfgfile,'outfile')
+    if(outfileflag):
+        outfile = cfgp.ltf_parse(cfgfile,'outfile')
+    else:
+        outfile = options.outfile 
     
     coljd = 1; colmag = 2 
     tmin=1.0
