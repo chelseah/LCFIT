@@ -21,8 +21,8 @@ temp_param_names = []
 temp_param_vals = []
 temp_param_range = []
 
-lc = functions.read_config_file("INPUT_LC")
-lc = loadtxt(lc)
+#lc = functions.read_config_file("INPUT_LC")
+#lc = loadtxt(lc)
 
 lc_ld1 = eval(functions.read_config_file("LC_LD1"))
 lc_ld1_err = eval(functions.read_config_file("LC_LD1_ERR"))
@@ -64,6 +64,35 @@ temp_param_names.append("esinw")
 temp_param_vals.append(float(functions.read_config_file("ESINW")))
 temp_param_range.append(float(functions.read_config_file("ESINW_ERR")))
 
+temp_param_names.append("edepth")
+temp_param_vals.append(float(functions.read_config_file("EDEPTH")))
+temp_param_range.append(float(functions.read_config_file("EDEPTH_ERR")))
+
+temp_param_names.append("beta")
+temp_param_vals.append(float(functions.read_config_file("BETA")))
+temp_param_range.append(float(functions.read_config_file("BETA_ERR")))
+
+temp_param_names.append("fratio")
+temp_param_vals.append(float(functions.read_config_file("FRATIO")))
+temp_param_range.append(float(functions.read_config_file("FRATIO_ERR")))
+
+temp_param_names.append("theta")
+temp_param_vals.append(float(functions.read_config_file("THETA")))
+temp_param_range.append(float(functions.read_config_file("THETA_ERR")))
+
+temp_param_names.append("phi")
+temp_param_vals.append(float(functions.read_config_file("PHI")))
+temp_param_range.append(float(functions.read_config_file("PHI_ERR")))
+
+temp_param_names.append("Protot")
+temp_param_vals.append(float(functions.read_config_file("ROTP")))
+temp_param_range.append(float(functions.read_config_file("ROTP_ERR")))
+
+
+temp_param_names.append("tdiff")
+temp_param_vals.append(float(functions.read_config_file("TDIFF")))
+temp_param_range.append(float(functions.read_config_file("TDIFF_ERR")))
+
 
 ### Distribute as free or fixed param, including associated brackets
 free_param_names = []
@@ -91,12 +120,16 @@ tested = loadtxt("mcmc_tested_params")
 prob = loadtxt("mcmc_chisq_log")
 prob = transpose(prob)
 
+minlen = min([len(tested),len(prob)])
+tested = tested[:minlen]
+prob = prob[:minlen]
+
 prob = exp((min(prob)-prob)/2)
 
 best_param = []
-
+maxprob = max(prob)
 for i in range(len(prob)):
-    if prob[i] == max(prob):
+    if prob[i] == maxprob:
         best_param = tested[i]
         break
 print "best parameters",best_param
@@ -126,7 +159,7 @@ def bin(nbins,xlist,zlist):
         if len(binarray[i]) > 10:
             sortarray = sort(binarray[i])
             sortarray = sortarray[-50:]
-            value = mean(sortarray)
+            value = median(sortarray)
             if functions.isnan(value):
                 zarray.append(value)
             else:
@@ -183,7 +216,7 @@ for i in range(len(axes_tested)):
     if axes_tested[i] in ["ecosw","esinw","rratio","rsum","t0","k0","period","q0","i_0"]:
         x,fit = fitsmooth(x,y,5)
     else:
-        x,fit = fitsmooth(x,y,50)
+        x,fit = fitsmooth(x,y,10)
 
     xmin,xmax = find_edges(x,fit)
     plt.axvline(x=xmin)
@@ -194,9 +227,13 @@ for i in range(len(axes_tested)):
         if fit[j] == max(fit):
             xmid = x[j]
             break
+
+    #xmid = best_param[i]
+
     plt.axvline(x=xmid)
 
-    print axes_tested[i],xmid,xmin-xmid,xmax-xmid
+    print axes_tested[i],best_param[i],xmid,xmin-xmid,xmax-xmid
+    #best_param.append(xmid)
 
     plt.plot(x,fit,"k-")    
     plt.xlabel(axes_tested[i])

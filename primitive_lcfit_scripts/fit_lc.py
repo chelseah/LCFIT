@@ -23,8 +23,15 @@ temp_param_names = []
 temp_param_vals = []
 temp_param_range = []
 
-lc = functions.read_config_file("INPUT_LC")
-lc = loadtxt(lc)
+lclist = functions.read_ascii(functions.read_config_file("INPUT_LC_LIST"))
+lc = []
+for lc_n in lclist:
+    lc.append(loadtxt(lc_n))
+
+cadence = []
+for i in lc:
+    cadence.append(functions.find_cadence(i))
+
 
 lc_ld1 = eval(functions.read_config_file("LC_LD1"))
 lc_ld1_err = eval(functions.read_config_file("LC_LD1_ERR"))
@@ -66,12 +73,40 @@ temp_param_names.append("esinw")
 temp_param_vals.append(float(functions.read_config_file("ESINW")))
 temp_param_range.append(float(functions.read_config_file("ESINW_ERR")))
 
+temp_param_names.append("edepth")
+temp_param_vals.append(float(functions.read_config_file("EDEPTH")))
+temp_param_range.append(float(functions.read_config_file("EDEPTH_ERR")))
+
+temp_param_names.append("beta")
+temp_param_vals.append(float(functions.read_config_file("BETA")))
+temp_param_range.append(float(functions.read_config_file("BETA_ERR")))
+
+temp_param_names.append("fratio")
+temp_param_vals.append(float(functions.read_config_file("FRATIO")))
+temp_param_range.append(float(functions.read_config_file("FRATIO_ERR")))
+
+temp_param_names.append("theta")
+temp_param_vals.append(float(functions.read_config_file("THETA")))
+temp_param_range.append(float(functions.read_config_file("THETA_ERR")))
+
+temp_param_names.append("phi")
+temp_param_vals.append(float(functions.read_config_file("PHI")))
+temp_param_range.append(float(functions.read_config_file("PHI_ERR")))
+
+temp_param_names.append("Protot")
+temp_param_vals.append(float(functions.read_config_file("ROTP")))
+temp_param_range.append(float(functions.read_config_file("ROTP_ERR")))
+
+temp_param_names.append("tdiff")
+temp_param_vals.append(float(functions.read_config_file("TDIFF")))
+temp_param_range.append(float(functions.read_config_file("TDIFF_ERR")))
 
 ### Distribute as free or fixed param, including associated brackets
 free_param_names = []
 free_param_vals = []
 free_param_range = []
 free_param_func = []
+free_param_lims = []
 
 fixed_param_names = []
 fixed_param_vals = []
@@ -84,12 +119,12 @@ for i in range(len(temp_param_names)):
         free_param_names.append(temp_param_names[i])
         free_param_vals.append(temp_param_vals[i])
         free_param_range.append(temp_param_range[i])
+        free_param_lims.append([-1*temp_param_range[i]/temp_param_vals[i],temp_param_range[i]/temp_param_vals[i]])
         free_param_func.append("b")
 
 print "FREE PARAMS"
 for i in range(len(free_param_names)):
     print free_param_names[i],free_param_vals[i],free_param_range[i]
-
 
 print "FIXED PARAMS"
 for i in range(len(fixed_param_names)):
@@ -97,13 +132,25 @@ for i in range(len(fixed_param_names)):
 
 x0 = zeros(len(free_param_names))
 
+for n in range(len(lc)):
+
+   lc[n]  = fitting_functions.inflate_errors(x0,free_param_names,free_param_vals,fixed_param_names,fixed_param_vals,lc[n],cadence[n])
+
 
 if functions.read_config_file("RUN_DOWNHILL") == "true":
     print "Running downhill minimisation"
 
     #x0 = optimize.fmin(fitting_functions.calc_master_chisq,x0,args=(free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False),maxiter=10**10,maxfun=10**10)
 
-    x0 = optimize.anneal(fitting_functions.calc_master_chisq,x0,args=(free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False))
+    #x0 = optimize.anneal(fitting_functions.calc_master_chisq,x0,args=(free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False))
+
+    # free_param_vals = optimize.anneal(fitting_functions.lc_chisq, free_param_vals, args=(free_param_names,fixed_param_names,fixed_param_vals,lc,False,False), lower = array(free_param_vals) - array(free_param_range),upper=array(free_param_vals)+array(free_param_range),dwell=20,learn_rate = 1.0,schedule="cauchy")
+    # print free_param_vals
+    # free_param_vals = free_param_vals[0]
+    # #sys.exit()
+    
+    free_param_vals,dummy,dummpy = optimize.fmin_tnc(fitting_functions.calc_master_chisq, x0, fprime=None, args=(free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False), approx_grad=True, bounds=free_param_lims)
+
 
     print free_param_names
     print x0*free_param_vals+free_param_vals
@@ -111,18 +158,16 @@ if functions.read_config_file("RUN_DOWNHILL") == "true":
 if functions.read_config_file("RUN_MCMC") == "true":
     print "running MCMC parameter search"
 
-    lc = fitting_functions.inflate_errors(x0,free_param_names,free_param_vals,fixed_param_names,fixed_param_vals,lc)
 
     ### Now perform mcmc
     os.system("rm mcmc_tested_params")
     os.system("rm mcmc_chisq_log")
 
     print "performing MCMC"
-    x0 = fitting_functions.mcmc_loop(x0,free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False)
+    x0 = fitting_functions.mcmc_loop(x0,free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,False,cadence)
 
     print free_param_names
     print x0*free_param_vals+free_param_vals
 
 
-
-fitting_functions.calc_master_chisq(x0,free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,True)
+fitting_functions.calc_master_chisq(x0,free_param_vals,free_param_names,fixed_param_names,fixed_param_vals,free_param_names,free_param_vals,free_param_range,free_param_func,lc,True,cadence)

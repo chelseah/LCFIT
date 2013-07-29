@@ -76,7 +76,7 @@ def read_ascii(file_location):
     ascii_file_temp = []
     ascii_file = open(file_location).read()
     ascii_file = string.split(ascii_file,"\n")
-    ascii_file = ascii_file[:len(ascii_file)-1]
+    ascii_file = ascii_file[:len(ascii_file)]
     for i in range(len(ascii_file)):
         if not ascii_file[i] == "":
             if not ascii_file[i][0] == "#":
@@ -272,3 +272,13 @@ def weighted_mean(input_list,input_weights):
     wgtmean = sum(input_list*input_weights) / sum(input_weights)
     return wgtmean
 
+
+def find_cadence(input_lightcurve):
+    diff = []
+    for i in range(len(input_lightcurve)-1):
+        diff.append(abs(input_lightcurve[i,0]-input_lightcurve[i+1,0]))
+    if median(diff) < 0.005:
+        cadence = "short"
+    else:
+        cadence = "long"
+    return cadence
