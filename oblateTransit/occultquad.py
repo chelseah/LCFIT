@@ -1,6 +1,6 @@
 from numpy import size,zeros,where,arccos,sqrt,pi,log
-#from cellip import *
-from ellip import *
+from cellip import *
+#from ellip import *
 import time
 ## tolerance for double precision equalities
 ## special case integrations
@@ -283,8 +283,8 @@ def occultquad(z,u1,u2,p0):
 
     #print '2',time.time()
     #mu1intran,mu0intran = occultintran(z[index],u1,u2,p)
-    mu1 = np.zeros(nz)
-    mu0 = np.zeros(nz)
+    mu1 = zeros(nz)
+    mu0 = zeros(nz)
     mu1[index] = mu1intran
     mu1[-index] = mu1outtran
     mu0[index] = mu0intran
