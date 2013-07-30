@@ -4,19 +4,21 @@ import scipy as sp
 from math import sqrt,cos
 import oblateness as Obl
 from occultquad import occultquad
+#from Eastman_occultquad import occultquad
 import matplotlib
 from matplotlib import pyplot as plt
 def main():
     rmean = 0.1
-    f = 0.1
-    alpha = 45/180.*np.pi
+    f = 0.2
+    alpha = 0/180.*np.pi
     sma = 8.924
     period = 2.218573 
-    inc = 89.7/180.*np.pi
+    inc = 89./180.*np.pi
     u1 = 0.076
     u2 = 0.034
     Npoint = 500
     percent = 0.025
+    #percent = 1.0
     dflux = np.zeros(Npoint)
     req = rmean/sqrt(1-f)
     rpol = sqrt(1-f)*rmean
@@ -31,13 +33,17 @@ def main():
     phi=-1*percent+dphi*np.arange(Npoint)
     #call
     obl.relativeFlux(phi,dflux)
-    z = abs(np.sin(phi*np.pi*2.))*sma
+    z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc));
+    #z = abs(np.sin(phi*np.pi))*sma#/abs(np.sin(inc))
     circularflux = occultquad(z,u1,u2,rpol)[0]
+    index = np.cos(phi*2*np.pi)<0
+    circularflux[index]=1.0
     #print z.shape,circularflux.shape
     #plt.plot(phi,circularflux)
-    #plt.plot(phi,circularflux-dflux/totalFlux)
+    #plt.plot(phi,z)
+    #plt.plot(phi,dflux/totalFlux)
     circularfluxmean = occultquad(z,u1,u2,rmean)[0]
-    plt.plot(phi,circularfluxmean-circularflux+dflux/totalFlux)
+    plt.plot(phi,(-circularfluxmean+circularflux-dflux/totalFlux)/1.e-6)
     plt.show()
     return
 

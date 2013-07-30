@@ -155,7 +155,12 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   double *d = new double [np];
   for (int i=0;i<np;i++){
 	/* distance between centers of the planet and the star */
-	  d[i]=sma_*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
+	  if(cos(phi[i]*2*pi) <0){
+      //when planet is at the back
+      deficitFlux[i] = 0.0;
+      continue;
+    }
+    d[i]=sma_*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
 	
 	  /* the embedded sphere's contribution */
 	  //*circleAnalogy = standardCurve(variables[1], d, variables[6], variables[7]);
