@@ -8,11 +8,15 @@ from occultquad import occultquad
 import matplotlib
 from matplotlib import pyplot as plt
 def main():
+    #rmean = 0.154679
     rmean = 0.1
-    f = 0.2
+    f = 0.098
     alpha = 0/180.*np.pi
-    sma = 8.924
-    period = 2.218573 
+    #sma = 8.924
+    sma = 30.
+    #period = 2.218573 
+    period = 50
+    #inc = 85.749/180.*np.pi
     inc = 89./180.*np.pi
     u1 = 0.076
     u2 = 0.034
