@@ -4,7 +4,6 @@ import numpy as np
 import scipy as sp
 import os
 from dataio import *
-from util import *
 from HATlc import lightcurve as lc
 from HATlc import tran
 import random
@@ -37,17 +36,15 @@ def gentran(time,period,epoch,q):
 def trangen(time,mag,transit):
     '''functions to generate fake lightcurves'''
     rmean = math.sqrt(transit.dip)
-    f = 0.098
+    f = 0.1
+    inc = 89.209*math.pi/180.
     alpha = 0/180.*np.pi
     sma = 1./transit.q/np.pi
-    inc = math.arccos(b/sma)
-    u1 = 0.076
-    u2 = 0.034
-    req = rmean/sqrt(1-f)
-    rpol = sqrt(1-f)*rmean
-
-    medianmag=np.median(mag)
-    stdmag=np.std(mag)
+    #inc = math.acos(b/sma)
+    u1 = 0.242
+    u2 = 0.289
+    req = rmean/math.sqrt(1-f)
+    rpol = math.sqrt(1-f)*rmean
     fkmag=sp.zeros(len(time))+mag
     #fkmag=medianmag+np.random.randn(len(time))*stdmag
     ntran=int((max(time)-transit.epoch)/transit.P)-int((min(time)-transit.epoch)/transit.P)+1
@@ -56,47 +53,54 @@ def trangen(time,mag,transit):
     tranwidth=transit.q*transit.P/2.
     obl = Obl.Oblateness(req,rpol,alpha,sma,inc,u1,u2)
     totalFlux = np.pi*(1.0-u1/3-u2/6)
-    for i in range(ntran):
-        midtran=transit.epoch+i*transit.P+int((min(time)-transit.epoch)/transit.P)*transit.P 
-        phase = (time-midtran)/transit.P
-        intran = gentran(time,transit.P,transit.epoch,transit.q)
-        dflux = np.zeros(len(time[intran]))
-        obl.relativeFlux(phi,dflux)
-        z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc))
-        circularflux = occultquad(z,u1,u2,rpol)[0]
-        index = np.cos(phi*2*np.pi)<0
-        circularflux[index]=1.0
-        fkmag[intran]+=1-(circularflux-dflux/totalflux)
+    phase = (time-transit.epoch)/transit.P-((time-transit.epoch)/transit.P).astype(int)
+    intran = gentran(time,transit.P,transit.epoch,transit.q)
+    medianmag=np.median(mag[-intran])
+    print rpol,medianmag
+    stdmag=np.std(mag[-intran])
+    dflux = np.zeros(len(time[intran]))
+    obl.relativeFlux(phase[intran],dflux)
+    z=sma*np.sqrt(np.sin(phase*2*np.pi)*np.sin(phase*2*np.pi)+np.cos(phase*2*np.pi)*np.cos(phase*2*np.pi)*np.cos(inc)*np.cos(inc))
+    circularflux = occultquad(z,u1,u2,rpol)[0]
+    index = np.cos(phase*2*np.pi)<0
+    circularflux[index]=1.0
+    fkmag[intran] = medianmag+np.random.randn(len(fkmag[intran]))*stdmag
+    fkmag[intran]+=1-(circularflux[intran]-dflux/totalFlux)
+    #fkmag[intran]+=1-(circularflux[intran])
+    #fkmag[intran]+=dflux/totalFlux
 
     return fkmag
 
 	
 def main():
-	lcfile=lc()
-	transit=tran()
-	if(1):	
-		path='./'
-		os.chdir(path)
-		#infile='HAT-365-0001481.epdlc'
-		#infile='K972_short_notran.txt'
-		infile='K972_llc_notran.txt'
-		coljd=1
-		#colmag=3
-		#colmag=12
-		colmag=2
-		transit.P=13.118908; rpstar=0.019;transit.dip=rpstar**2.
-  		transit.q=transit.calq(rstar=2.92,logg=3.82)
-		time=[];readcolumn(time,coljd,infile);time=np.array(time)
-		#transit.epoch=min(time)+random.random();
-		transit.epoch=1617.2
-		mag=[];readcolumn(mag,colmag,infile);mag=np.array(mag)
-		fkmag=trangen(time,mag,transit)
-		outfile=os.path.splitext(infile)[0]+'.fktrap'
-		fout=open(outfile,mode='w')
-		for i in range(len(time)):
-			fout.write('%13.6f %13.6f %13.6f\n' % (time[i],mag[i],fkmag[i]))
-		fout.close()
-	return
+    lcfile=lc()
+    transit=tran()
+    if(1):	
+        path='./'
+        os.chdir(path)
+        #infile='HAT-365-0001481.epdlc'
+        #infile='K972_short_notran.txt'
+        #infile='data/kplr006603043-2011024051157_slc.tab'
+        infile='data/kplr006603043-2011145075126_slc.tab'
+        #infile='data/kplr006603043.ltf'
+        coljd=1
+        colmag=4
+        #colmag=12
+        transit.P=110.3216229;  
+        rpstar=0.08453;
+        transit.dip=rpstar**2.
+        transit.q=transit.calq(rstar=2.5,logg=4.07)
+        time=[];readcolumn(time,coljd,infile);time=np.array(time)
+        #transit.epoch=min(time)+random.random();
+        transit.epoch=1030.36382
+        mag=[];readcolumn(mag,colmag,infile);mag=np.array(mag)
+        fkmag=trangen(time,mag,transit)
+        outfile=os.path.splitext(infile)[0]+'.fktrap'
+        fout=open(outfile,mode='w')
+        for i in range(len(time)):
+            fout.write('%13.6f %13.6f %13.6f\n' % (time[i],mag[i],fkmag[i]))
+        fout.close()
+    return
 
 
 if __name__=='__main__':
