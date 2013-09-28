@@ -11,7 +11,7 @@ def main():
     #rmean = 0.154679
     rmean = 0.1
     f = 0.098
-    alpha = 0/180.*np.pi
+    alpha = 45./180.*np.pi
     #sma = 8.924
     sma = 30.
     #period = 2.218573 
@@ -37,6 +37,7 @@ def main():
     phi=-1*percent+dphi*np.arange(Npoint)
     #call
     obl.relativeFlux(phi,dflux)
+    #print phi,dflux
     z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc));
     #z = abs(np.sin(phi*np.pi))*sma#/abs(np.sin(inc))
     circularflux = occultquad(z,u1,u2,rpol)[0]
