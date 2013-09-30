@@ -63,47 +63,64 @@ def trangen(time,mag,transit,lcflag=False):
     medianmag=np.median(mag[-intran])
     stdmag=np.std(mag[-intran])
     stdmag = 1.e-4
-    fkmag=medianmag+np.random.randn(len(time))*stdmag
     #print rpol,medianmag
     phase = (time-transit.epoch)/transit.P-((time-transit.epoch)/transit.P).astype(int)
     ind = phase>0.5
     phase[ind]-=1.0
 
+    fkmag=medianmag+np.random.randn(len(time))*stdmag
     if(lcflag):
+        circularfluxmeanlc=medianmag+np.random.randn(len(time))*stdmag
         cadence = 1./60./24.
         nt = (int)((max(time)-min(time))/cadence)
         fktime = min(time)+np.arange(nt)*cadence
+        fkmagsc=medianmag+np.random.randn(len(fktime))*stdmag
         fkintran = gentran(fktime,transit.P,transit.epoch,transit.q) 
         fkphase = (fktime-transit.epoch)/transit.P-((fktime-transit.epoch)/transit.P).astype(int)
+        ind = fkphase>0.5
+        fkphase[ind]-=1.0
         fkdflux = np.zeros(len(fktime[fkintran]))
         obl.relativeFlux(fkphase[fkintran],fkdflux)
-        dflux = binlc(time[intran],fktime[intran],fkdflux)
+        z=sma*np.sqrt(np.sin(fkphase*2*np.pi)*np.sin(fkphase*2*np.pi)+np.cos(fkphase*2*np.pi)*np.cos(fkphase*2*np.pi)*np.cos(inc)*np.cos(inc))
+        circularfluxmean = occultquad(z,u1,u2,rmean)[0]
+        circularflux = occultquad(z,u1,u2,rpol)[0]
+        index = np.cos(fkphase*2*np.pi)<0
+        circularflux[index]=1.0
+        circularfluxmean[index]=1.0
+        fkmagsc[fkintran] = medianmag
+        fkmagsc[fkintran]+=1-(circularflux[fkintran]-fkdflux/totalFlux)
+        circularfluxmean=1-circularfluxmean+medianmag
+        fkmag[intran] = binlc(time[intran],fktime[fkintran],fkmagsc[fkintran])
+        residual = (fkmagsc-circularfluxmean)/1.e-6
+        circularfluxmeanlc[intran] = binlc(time[intran],fktime[fkintran],circularfluxmean[fkintran]) + np.random.randn(len(time[intran]))*stdmag
+        circularfluxmean = circularfluxmeanlc 
+        #plt.plot(fkphase[fkintran],(-circularfluxmean[fkintran]+circularflux[fkintran]-fkdflux/totalFlux)/1.e-6,'r') 
+        #plt.xlim([-0.01,0.01])
+        #plt.show()
+        #plt.plot(fktime,1-circularflux+medianmag,'r',time,mag) 
+        #plt.show()
+        #dflux = binlc(time[intran],fktime[fkintran],fkdflux)
     else:
         dflux = np.zeros(len(time[intran]))
         obl.relativeFlux(phase[intran],dflux)
             
-    z=sma*np.sqrt(np.sin(phase*2*np.pi)*np.sin(phase*2*np.pi)+np.cos(phase*2*np.pi)*np.cos(phase*2*np.pi)*np.cos(inc)*np.cos(inc))
+        z=sma*np.sqrt(np.sin(phase*2*np.pi)*np.sin(phase*2*np.pi)+np.cos(phase*2*np.pi)*np.cos(phase*2*np.pi)*np.cos(inc)*np.cos(inc))
     
-    circularflux = occultquad(z,u1,u2,rpol)[0]
+        circularflux = occultquad(z,u1,u2,rpol)[0]
     
-    index = np.cos(phase*2*np.pi)<0
-    circularflux[index]=1.0
+        index = np.cos(phase*2*np.pi)<0
+        circularflux[index]=1.0
     
-    circularfluxmean = occultquad(z,u1,u2,rmean)[0]
-    
-    plt.plot(phase[intran],(-circularfluxmean[intran]+circularflux[intran]-dflux/totalFlux)/1.e-6,'r') 
-    plt.xlim([-0.01,0.01])
-    #plt.show() 
-    fkmag[intran] = medianmag+np.random.randn(len(fkmag[intran]))*stdmag
-    #fkmag[intran] = medianmag
-    #fkmag+= medianmag
-    fkmag[intran]+=1-(circularflux[intran]-dflux/totalFlux)
-    circularfluxmean=1-circularfluxmean+medianmag+np.random.randn(len(fkmag))*stdmag
+        circularfluxmean = occultquad(z,u1,u2,rmean)[0]
+        circularfluxmean[index]=1.0
+
+
+        fkmag[intran] = medianmag+np.random.randn(len(fkmag[intran]))*stdmag
+        fkmag[intran]+=1-(circularflux[intran]-dflux/totalFlux)
+        circularfluxmean=1-circularfluxmean+medianmag+np.random.randn(len(fkmag))*stdmag
 
     plt.plot(phase[intran],(-circularfluxmean[intran]+fkmag[intran])/1.e-6,'o',mec='b',mfc='None',ms=1.5,mew=1)
-    #plt.plot(phase,circularfluxmean)
-    #plt.plot(phase,fkmag)
-    ##plt.plot(phi,(-circularfluxmean+circularflux-dflux/totalFlux)/1.e-6)
+    plt.plot(fkphase[fkintran],residual[fkintran],'r')
     plt.show()
     
     return [fkmag,circularfluxmean]
@@ -117,11 +134,11 @@ def main():
         os.chdir(path)
         #infile='HAT-365-0001481.epdlc'
         #infile='K972_short_notran.txt'
-        infile='data/kplr006603043-2011024051157_slc.tab'
+        #infile='data/kplr006603043-2011024051157_slc.tab'
         #infile='data/kplr006603043-2011145075126_slc.tab'
-        #infile='data/kplr006603043.ltf'
+        infile='data/kplr006603043.ltf'
         coljd=1
-        colmag=4
+        colmag=7
         #colmag=12
         transit.P=110.3216229;  
         rpstar=0.08453;
@@ -136,8 +153,8 @@ def main():
         #transit.epoch=min(time)+random.random();
         transit.epoch=1030.36382
         mag=[];readcolumn(mag,colmag,infile);mag=np.array(mag)
-        #fkmag=trangen(time,mag,transit,lcflag=True)
-        fkmag,circularflux=trangen(time,mag,transit)
+        #fkmag,circularflux=trangen(time,mag,transit)
+        fkmag,circularflux=trangen(time,mag,transit,lcflag=True)
         outfile=os.path.splitext(infile)[0]+'.fktrap'
         fout=open(outfile,mode='w')
         fout.write('#Generated by lcgen with the following paramters:\n')
