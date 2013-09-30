@@ -45,8 +45,8 @@ def trangen(time,mag,transit,lcflag=False):
     #u1 = 0.076; u2 = 0.034; 
     sma = 1./transit.q/np.pi
     #inc = math.acos(b/sma)
-    rmean = 0.1
-    f = 0.098
+    #rmean = 0.1
+    #f = 0.098
 
     req = rmean/math.sqrt(1-f)
     rpol = math.sqrt(1-f)*rmean
