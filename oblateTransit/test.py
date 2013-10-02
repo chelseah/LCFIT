@@ -9,17 +9,17 @@ import matplotlib
 from matplotlib import pyplot as plt
 def main():
     #rmean = 0.154679
-    rmean = 0.1
-    f = 0.098
+    rmean = 0.08453
+    f = 0.1
     alpha = 45./180.*np.pi
     #sma = 8.924
-    sma = 30.
+    sma = 49.584
     #period = 2.218573 
-    period = 50
+    period = 110.3216229
     #inc = 85.749/180.*np.pi
-    inc = 89./180.*np.pi
-    u1 = 0.076
-    u2 = 0.034
+    inc = 89.209/180.*np.pi
+    u1 = 0.242
+    u2 = 0.289
     Npoint = 500
     percent = 0.025
     #percent = 1.0
@@ -47,7 +47,10 @@ def main():
     #plt.plot(phi,circularflux)
     #plt.plot(phi,z)
     #plt.plot(phi,dflux/totalFlux)
+    #plt.xlim([-0.006,0.006])
     circularfluxmean = occultquad(z,u1,u2,rmean)[0]
+    #plt.plot(phi,circularflux-dflux/totalFlux)
+    #plt.xlim([-0.01,0.01])
     plt.plot(phi,(-circularfluxmean+circularflux-dflux/totalFlux)/1.e-6)
     plt.show()
     return

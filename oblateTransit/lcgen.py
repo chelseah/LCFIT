@@ -44,6 +44,7 @@ def trangen(time,mag,transit,lcflag=False):
     u2 = transit.u2
     #u1 = 0.076; u2 = 0.034; 
     sma = 1./transit.q/np.pi
+    print sma
     #inc = math.acos(b/sma)
     #rmean = 0.1
     #f = 0.098
@@ -143,7 +144,8 @@ def main():
         transit.P=110.3216229;  
         rpstar=0.08453;
         transit.dip=rpstar**2.
-        transit.q=transit.calq(rstar=2.5,logg=4.07) 
+        transit.q=transit.calq(rstar=2.5,logg=4.07)
+        print transit.q
         transit.f = 0.1
         transit.inc = 89.209
         transit.alpha = 45.
