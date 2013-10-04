@@ -141,6 +141,7 @@ def main():
         coljd=1
         colmag=7
         #colmag=12
+        #replace with the parsing inside transit class
         transit.P=110.3216229;  
         rpstar=0.08453;
         transit.dip=rpstar**2.
@@ -151,6 +152,7 @@ def main():
         transit.alpha = 45.
         transit.u1 = 0.242
         transit.u2 = 0.289
+        #
         time=[];readcolumn(time,coljd,infile);time=np.array(time)
         #transit.epoch=min(time)+random.random();
         transit.epoch=1030.36382

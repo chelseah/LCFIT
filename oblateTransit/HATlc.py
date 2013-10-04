@@ -23,6 +23,17 @@ class tran():
         self.u2 = -1
     def __str__(self):
         return '%13.6f %13.6f %6.4e %4.2e \n' % (self.P, self.epoch,self.dip,self.q)
+    def readpara(self,cfgfile):
+        self.P = float(cfgp.ltf_parse(cfgfile,'period')) 
+        self.q = float(cfgp.ltf_parse(cfgfile,'q'))
+        self.qg = float(cfgp.ltf_parse(cfgfile,'qgress'))
+        self.dip = float(cfgp.ltf_parse(cfgfile,'rpstar'))**2.
+        self.epoch =float(cfgp.ltf_parse(cfgfile,'epoch'))
+        self.f =float(cfgp.ltf_parse(cfgfile,'qgress'))
+        self.inc =
+        self.alpha =
+        self.u1 = 
+        self.u2 = 
     def calq(self,rstar=1,logg=4.5):
         if(self.dip<=0):
             raise ValueError('A real planet to calculate qexp should have positive depth')
