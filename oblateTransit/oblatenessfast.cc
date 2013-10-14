@@ -152,14 +152,21 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 */
 	double rc=1.0;
   double *d = new double [np];
+  double *index = new double[np];
   double clc1=0.0,clc2=0.0,clc3=0.0;
   clock_t init,final;
+	double b0=sma_*cos(inc_);
+	double epsilon = Req_/Rpole_;
+	double epsilon2 = epsilon*epsilon;
+	double *xc = new double[np], *yc=new double[np], *thetaa = new double[np],*thetab = new double[np];
+	double beta = 0.0;
   for (int i=0;i<np;i++){
 	/* distance between centers of the planet and the star */
     init = clock();
 	  if(cos(phi[i]*2*pi) <0){
       //when planet is at the back
       deficitFlux[i] = 0.0;
+      index[i] = 0.0;
       continue;
     }
     d[i]=sma_*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
@@ -170,30 +177,29 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	  /* if no transit happens */
 	  if(d[i] >= (1.0+Req_)){ 
       deficitFlux[i] = 0.0;
+      index[i] = 0.0;
       continue;
     }
 	
 	  /* angle between the major axis and the line connecting two centers */
-	  double beta;
-	  double b0=sma_*cos(inc_);
 	  if(phi[i]<=0) beta = alpha_+asin(b0/d[i]); /* ingress */
 	  if(phi[i]>0)  beta = alpha_-pi-asin(b0/d[i]); /* egress */
 
 	    /* star's position and intersection points */
-	  double xc, yc;
-	  xc = d[i]*cos(beta);
-	  yc = d[i]*sin(beta);
+	  xc[i] = d[i]*cos(beta);
+	  yc[i] = d[i]*sin(beta);
 	  double xinter[2], yinter[2];
 	  int npoints;
     final = clock()-init;
     clc1+=((double)final/((double)CLOCKS_PER_SEC));
     init = clock();
-	  IntersectionPoints_(xinter, yinter, &npoints, Req_, Rpole_, xc, yc);
+	  IntersectionPoints_(xinter, yinter, &npoints, Req_, Rpole_, xc[i], yc[i]);
     final = clock()-init;
     clc2+=((double)final/((double)CLOCKS_PER_SEC));
 	
 	  if(d[i]>1.0 && npoints<2) { /* the planet is outside the stellar plane, and there is no intersectiosn */
 		  deficitFlux[i] = 0.0;
+      index[i] = 0.0;
       continue;
 	  }
 
@@ -201,10 +207,13 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	  double theta1, theta2, t;
 	  double F00; /* F(x;a,b,alpha,0,0)-F(x;b,0,0) */
 	  if(d[i]<1.0 && npoints<2) { /* the planet is inside the stellar plane and there is no intersections */
-		theta1 = 0.0;
-		theta2 = 2*pi;
-		F00 = pi*Rpole_*(Req_-Rpole_);
-	  }
+		  theta1 = 0.0;
+	  	theta2 = 2*pi;
+		  F00 = pi*Rpole_*(Req_-Rpole_);
+	    index[i] = 1.0;
+    } else {
+      index[i] = 0.0;
+    }
 	  if(npoints==2) { /* two intersections */
 		  if(yinter[0] >= 0)
 	  		theta1 = acos(xinter[0]/Req_);
@@ -226,15 +235,14 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	  xtest = Req_*cos(theta0);
 	  ytest = Rpole_*sin(theta0);
 	  double dtest;
-	  dtest = (xtest-xc)*(xtest-xc)+(ytest-yc)*(ytest-yc)-1.0;
+	  dtest = (xtest-xc[i])*(xtest-xc[i])+(ytest-yc[i])*(ytest-yc[i])-1.0;
 	  if(dtest>0) {
 		  t = theta2-2*pi;
 		  theta2 = theta1;
 		  theta1 = t;
 	  }
-
-	  double epsilon = Req_/Rpole_;
-	  double epsilon2 = epsilon*epsilon;
+    thetaa[i] = theta1;
+    thetab[i] = theta2;
 	  double chordArea1, chordArea2;
 	  double dtheta=theta2-theta1;
 	  double ksi, psi, cc, p2;
@@ -244,7 +252,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       }else{
 		    chordArea1 = dtheta*Req_*Rpole_*0.5+TriangleArea_(xinter, yinter);
       }
-		  chordArea2 = CircleChordArea_(xinter, yinter, xc, yc, 1.0);
+		  chordArea2 = CircleChordArea_(xinter, yinter, xc[i], yc[i], 1.0);
 		  if(d[i]>=(Rpole_+1.0)) /* the two circles are separated */
       {
 		    F00 = chordArea1+chordArea2;
@@ -259,46 +267,130 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       }
 	  }
 
-	  int Nrays;
-	  Nrays = 3000;
-	  double eta1, eta2, theta, R, x, y;
-	  double contribution=0.0, separation1, separation2;
-	  double total=0.0;
+    /*Deal with the ingress and egress*/
+    if (index[i]==0.0){    
+    //if (1){    
+	    int Nrays;
+	    Nrays = 3000;
+	    double eta1, eta2, theta, R, x,y;
+	    double contribution=0.0, separation1, separation2;
+	    double total=0.0;
 	
-    init = clock();
-	  for(int j=1; j<=Nrays; j++)
-	  {
-		  eta1 = Ran1_(&seed);
-		  eta2 = Ran1_(&seed);
-		  theta = (1.0-eta2)*theta1+eta2*theta2;
-		  R = sqrt(eta1+(1-eta1)/epsilon2);
-		  x = Req_*R*cos(theta);
-		  y = Rpole_*R*sin(theta);
-		  /* distance to the center of the star */
-		  separation1 = (x-xc)*(x-xc)+(y-yc)*(y-yc);
-		  /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
-		  if(separation1 > 1.0) continue;
-		  /* distance to the center of the planet */
-		  separation2 = x*x+y*y;
-		  
-
-      if(separation2 < Rpole_*Rpole_) continue;
-		  /* otherwise, add its contribution on */
-		  contribution += LimbDarkening_(separation1);
-//      if(i==230){          printf("%d %f %f %f %f %f %f %f\n", j, contribution, x, y, separation1,separation2, theta1,theta2);
-//                }
-//
+      init = clock();
+	    for(int j=1; j<=Nrays; j++)
+	    { 
+		    eta1 = Ran1_(&seed);
+		    eta2 = Ran1_(&seed);
+		    theta = (1.0-eta2)*theta1+eta2*theta2;
+		    R = sqrt(eta1+(1-eta1)/epsilon2);
+		    x = Req_*R*cos(theta);
+		    y = Rpole_*R*sin(theta);
+		    /* distance to the center of the star */
+		    separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+        
+		    /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
+		    if(separation1 > 1.0) continue;
+		    /* distance to the center of the planet */
+		    separation2 = x*x+y*y;
+		    if(separation2 < Rpole_*Rpole_) continue;
+		    /* otherwise, add its contribution on */
+		    contribution += LimbDarkening_(separation1);
+	    }
+	
+      final = clock()-init;
+      clc3+=((double)final/((double)CLOCKS_PER_SEC));
+	    double totalArea, Istar;
+	    totalArea = dtheta*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
+	    Istar = contribution*totalArea/Nrays;
+	    deficitFlux[i] = (1.0-u1_-u2_)*F00+Istar;
+      //printf("%d %f %f %f %f\n", i, F00,contribution,xc[i],yc[i]);
+    } else {
+      deficitFlux[i] = (1.0-u1_-u2_)*F00;
     }
-	
-    final = clock()-init;
-    clc3+=((double)final/((double)CLOCKS_PER_SEC));
-	  
-    double totalArea, Istar;
-	  totalArea = dtheta*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
-	  Istar = contribution*totalArea/Nrays;
-	  deficitFlux[i] = (1.0-u1_-u2_)*F00+Istar;
-    //printf("%d %f %f %f %f\n", i, F00, contribution, xc,yc);
   }
+  //return;
+  //printf("should not reach here\n");
+  /********************************************************/
+  /*Deal with planet completely inside the star differently*/ 
+  int flag = 0;
+  init = clock();
+  int Nrays;
+	Nrays = 3000;
+	double eta1, eta2, theta, R, x, y,*etaa=new double[Nrays], *etab=new double[Nrays],d0;
+	double contribution=0.0, separation1, separation2;
+  for (int i=0;i<np;i++){
+    //if(index[i]==1.0 and flag==0){
+    if(index[i]==1.0 and flag==0){
+      //printf("I should be here\n");
+      contribution = 0.0;
+      for(int j=1; j<=Nrays;j++)
+      //int j = 1;
+      //while (j<=Nrays) /*make sure I got enough sampling*/
+	    {
+        //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
+		    eta1 = Ran1_(&seed);
+		    eta2 = Ran1_(&seed);
+		    theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
+		    R = sqrt(eta1+(1-eta1)/epsilon2);
+		    x = Req_*R*cos(theta);
+		    y = Rpole_*R*sin(theta);
+		    etaa[j]=-1; etab[j]=-1; 
+        /* distance to the center of the star */
+		    separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+		    /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
+		    if(separation1 > 1.0) continue;
+		    /* distance to the center of the planet */
+		    separation2 = x*x+y*y;
+		    if(separation2 < Rpole_*Rpole_) continue;
+		    /* otherwise, add its contribution on */
+		    contribution += LimbDarkening_(separation1);
+        etaa[j]=eta1; etab[j]=eta2;
+        flag = 1;
+        //if(i==230){
+        //  printf("%d %f %f %f %f %f %f %f\n", j, contribution, x, y, separation1,separation2, thetaa[i],thetab[i]);
+        //}
+        //j++;
+      }
+      //printf("%d %f %f %f\n", i, contribution,xc[i],yc[i]);
+      d0 = d[i];
+      double totalArea, Istar;
+	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
+	    Istar = contribution*totalArea/Nrays;
+	    deficitFlux[i] += Istar;
+
+    } else { 
+      if (index[i]==1.0 and flag ==1){	
+        contribution = 0.0;
+    //  //double correction = sqrt(d[i]*d[i]-b0*b0)-sqrt(d0*d0-b0*b0);
+    //  //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
+        for (int j=1;j<=Nrays;j++){
+    //    //x = x0[j]-correction; y = y0[j];
+    //    //x = x0[j]; y = y0[j];
+		//    eta1 = Ran1_(&seed);
+		//    eta2 = Ran1_(&seed);
+		//    theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
+		//    R = sqrt(eta1+(1-eta1)/epsilon2);
+          if(etaa[j]==-1) continue;
+          
+		      theta = (1.0-etab[j])*thetaa[i]+etab[j]*thetab[i];
+		      R = sqrt(etaa[j]+(1-etaa[j])/epsilon2);
+		      x = Req_*R*cos(theta);
+		      y = Rpole_*R*sin(theta);
+		//    //separation1 = (x-(xc[i]+correction))*(x-(xc[i]+correction))+(y-yc[i])*(y-yc[i]);
+		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+		      contribution += LimbDarkening_(separation1);
+        }
+      double totalArea, Istar;
+	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
+	    Istar = contribution*totalArea/Nrays;
+	    deficitFlux[i] += Istar;
+
+      }
+    }
+  }
+  final = clock()-init;
+  clc3+=((double)final/((double)CLOCKS_PER_SEC));
+
   printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
 }

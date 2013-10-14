@@ -18,6 +18,11 @@ _elliptic = Extension("_elliptic",
             "elliptic.cc"],
         include_dirs = [numpy_include],
         )
+_oblatenessfast = Extension("_oblatenessfast",
+        ["oblatenessfast_wrap.cxx",
+            "oblatenessfast.cc"],
+        include_dirs = [numpy_include],
+        )
 
 setup(name="Oblate",
         description = "model for an oblate planet",
@@ -25,5 +30,5 @@ setup(name="Oblate",
         author_email = "",
         url = "",
         version = "0.0.0",
-        py_modules = ["oblateness","elliptic"],
-        ext_modules = [_oblateness,_elliptic])
+        py_modules = ["oblateness","elliptic","oblatenessfast"],
+        ext_modules = [_oblateness,_elliptic,_oblatenessfast])
