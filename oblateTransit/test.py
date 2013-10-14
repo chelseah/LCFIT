@@ -24,7 +24,7 @@ def main():
     #inc = 90./180.*np.pi
     u1 = 0.242
     u2 = 0.289
-    Npoint = 500
+    Npoint = 1000
     percent = 0.025
     #percent = 1.0
     dflux = np.zeros(Npoint)
@@ -48,6 +48,8 @@ def main():
     start = time.clock()
     #print '1',time.time(),time.clock()-start
     obl.relativeFlux(phi,dflux)
+    print '1old',time.time(),time.clock()-start
+    start = time.clock()
     oblf.relativeFlux(phi,dfluxF)
     print '1',time.time(),time.clock()-start
     #print phi,dflux

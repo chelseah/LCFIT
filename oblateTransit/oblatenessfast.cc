@@ -163,7 +163,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   double contribution=0.0, separation1, separation2;
   int Nrays = 3000; //hard wire in sample parameters
   double *etaa=new double[Nrays], *etab=new double[Nrays];
-  printf("%x %x %x %x %x %x\n",d,index,xc,yc,etaa,etab);
+  //printf("%x %x %x %x %x %x\n",d,index,xc,yc,etaa,etab);
   for (int i=0;i<np;i++){
     /* distance between centers of the planet and the star */
     init = clock();
@@ -365,7 +365,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   final = clock()-init;
   clc3+=((double)final/((double)CLOCKS_PER_SEC));
 
-  printf("three zones: %f %f %f\n",clc1,clc2,clc3);
+  //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
   delete [] index;
   delete [] xc;
