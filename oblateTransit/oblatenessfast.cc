@@ -274,7 +274,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
     /*Deal with the ingress and egress*/
     if (index[i]==0.0){    
 	    contribution = 0.0;
-            init = clock();
+      init = clock();
 	    for(int j=0; j<Nrays; j++)
 	    { 
 		    eta1 = Ran1_(&seed);
@@ -306,47 +306,43 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       deficitFlux[i] = (1.0-u1_-u2_)*F00;
     }
   }
+  //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   /********************************************************/
   /*Deal with planet completely inside the star differently*/ 
   int flag = 0;
   init = clock();
   //double contribution=0.0, separation1, separation2;
   for (int i=0;i<np;i++){
-    if(index[i]==1.0 and flag==0){
-      contribution = 0.0;
-      for(int j=0; j<Nrays;j++)
-	    {
-        //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
-		    eta1 = Ran1_(&seed);
-		    eta2 = Ran1_(&seed);
-		    theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
-		    R = sqrt(eta1+(1-eta1)/epsilon2);
-		    x = Req_*R*cos(theta);
-		    y = Rpole_*R*sin(theta);
-		    etaa[j]=-1; etab[j]=-1; 
-        /* distance to the center of the star */
-		    separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
-		    /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
-		    if(separation1 > 1.0) continue;
-		    /* distance to the center of the planet */
-		    separation2 = x*x+y*y;
-		    if(separation2 < Rpole_*Rpole_) continue;
-		    /* otherwise, add its contribution on */
-		    contribution += LimbDarkening_(separation1);
-        etaa[j]=eta1; etab[j]=eta2;
+    if(index[i]==1.0){
+      //printf("%d %f %f\n",i,thetaa[i],thetab[i]);
+      if(flag==0){
+        contribution = 0.0;
+        for(int j=0; j<Nrays;j++)
+	      {
+		      eta1 = Ran1_(&seed);
+		      eta2 = Ran1_(&seed);
+		      theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
+		      R = sqrt(eta1+(1-eta1)/epsilon2);
+		      x = Req_*R*cos(theta);
+		      y = Rpole_*R*sin(theta);
+		      etaa[j]=-1; etab[j]=-1; 
+          /* distance to the center of the star */
+		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+		      /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
+		      if(separation1 > 1.0) continue;
+		      /* distance to the center of the planet */
+		      separation2 = x*x+y*y;
+		      if(separation2 < Rpole_*Rpole_) continue;
+		      /* otherwise, add its contribution on */
+		      contribution += LimbDarkening_(separation1);
+          etaa[j]=eta1; etab[j]=eta2;
+        }
         flag = 1;
-    }
-      double totalArea, Istar;
-	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
-	    Istar = contribution*totalArea/Nrays;
-	    deficitFlux[i] += Istar;
-
-    } else { 
-      if (index[i]==1.0 and flag ==1){	
+      } else {  
         contribution = 0.0;
         for (int j=0;j<Nrays;j++){
           if(etaa[j]==-1) continue;
-          
+           
 		      theta = (1.0-etab[j])*thetaa[i]+etab[j]*thetab[i];
 		      R = sqrt(etaa[j]+(1-etaa[j])/epsilon2);
 		      x = Req_*R*cos(theta);
@@ -354,16 +350,16 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
 		      contribution += LimbDarkening_(separation1);
         }
+      }
       double totalArea, Istar;
 	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
 	    Istar = contribution*totalArea/Nrays;
 	    deficitFlux[i] += Istar;
-
-      }
     }
   }
   final = clock()-init;
   clc3+=((double)final/((double)CLOCKS_PER_SEC));
+  //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
 
   //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
