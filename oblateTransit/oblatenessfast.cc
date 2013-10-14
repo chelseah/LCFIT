@@ -154,14 +154,18 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   double *index = new double[np];
   double clc1=0.0,clc2=0.0,clc3=0.0;
   clock_t init,final;
-	double b0=sma_*cos(inc_);
-	double epsilon = Req_/Rpole_;
-	double epsilon2 = epsilon*epsilon;
-	double *xc = new double[np], *yc=new double[np], *thetaa = new double[np],*thetab = new double[np];
-	double beta = 0.0;
+  double b0=sma_*cos(inc_);
+  double epsilon = Req_/Rpole_;
+  double epsilon2 = epsilon*epsilon;
+  double *xc = new double[np], *yc=new double[np], *thetaa = new double[np],*thetab = new double[np];
+  double beta = 0.0;
+  double eta1, eta2, theta, R, x, y;
+  double contribution=0.0, separation1, separation2;
   int Nrays = 3000; //hard wire in sample parameters
+  double *etaa=new double[Nrays], *etab=new double[Nrays];
+  printf("%x %x %x %x %x %x\n",d,index,xc,yc,etaa,etab);
   for (int i=0;i<np;i++){
-	/* distance between centers of the planet and the star */
+    /* distance between centers of the planet and the star */
     init = clock();
 	  if(cos(phi[i]*2*pi) <0){
       //when planet is at the back
@@ -269,11 +273,9 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 
     /*Deal with the ingress and egress*/
     if (index[i]==0.0){    
-	    double eta1, eta2, theta, R, x,y;
-	    double contribution=0.0, separation1, separation2;
-	
-      init = clock();
-	    for(int j=1; j<=Nrays; j++)
+	    contribution = 0.0;
+            init = clock();
+	    for(int j=0; j<Nrays; j++)
 	    { 
 		    eta1 = Ran1_(&seed);
 		    eta2 = Ran1_(&seed);
@@ -308,12 +310,11 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   /*Deal with planet completely inside the star differently*/ 
   int flag = 0;
   init = clock();
-	double eta1, eta2, theta, R, x, y,*etaa=new double[Nrays], *etab=new double[Nrays],d0;
-	double contribution=0.0, separation1, separation2;
+  //double contribution=0.0, separation1, separation2;
   for (int i=0;i<np;i++){
     if(index[i]==1.0 and flag==0){
       contribution = 0.0;
-      for(int j=1; j<=Nrays;j++)
+      for(int j=0; j<Nrays;j++)
 	    {
         //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
 		    eta1 = Ran1_(&seed);
@@ -335,7 +336,6 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
         etaa[j]=eta1; etab[j]=eta2;
         flag = 1;
     }
-      d0 = d[i];
       double totalArea, Istar;
 	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
 	    Istar = contribution*totalArea/Nrays;
@@ -344,7 +344,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
     } else { 
       if (index[i]==1.0 and flag ==1){	
         contribution = 0.0;
-        for (int j=1;j<=Nrays;j++){
+        for (int j=0;j<Nrays;j++){
           if(etaa[j]==-1) continue;
           
 		      theta = (1.0-etab[j])*thetaa[i]+etab[j]*thetab[i];
@@ -368,7 +368,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
   delete [] index;
-	delete [] xc;
+  delete [] xc;
   delete [] yc;
   delete [] thetaa; 
   delete [] thetab;
