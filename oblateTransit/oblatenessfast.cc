@@ -150,7 +150,6 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	variables[8] = n; observation times
 	variables[9] = percentage; phase interval
 */
-	double rc=1.0;
   double *d = new double [np];
   double *index = new double[np];
   double clc1=0.0,clc2=0.0,clc3=0.0;
@@ -160,6 +159,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	double epsilon2 = epsilon*epsilon;
 	double *xc = new double[np], *yc=new double[np], *thetaa = new double[np],*thetab = new double[np];
 	double beta = 0.0;
+  int Nrays = 3000; //hard wire in sample parameters
   for (int i=0;i<np;i++){
 	/* distance between centers of the planet and the star */
     init = clock();
@@ -204,8 +204,8 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	  }
 
 	  /* calculate the limitation region */
-	  double theta1, theta2, t;
-	  double F00; /* F(x;a,b,alpha,0,0)-F(x;b,0,0) */
+	  double theta1=0, theta2=0, t;
+	  double F00=0; /* F(x;a,b,alpha,0,0)-F(x;b,0,0) */
 	  if(d[i]<1.0 && npoints<2) { /* the planet is inside the stellar plane and there is no intersections */
 		  theta1 = 0.0;
 	  	theta2 = 2*pi;
@@ -269,12 +269,8 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 
     /*Deal with the ingress and egress*/
     if (index[i]==0.0){    
-    //if (1){    
-	    int Nrays;
-	    Nrays = 3000;
 	    double eta1, eta2, theta, R, x,y;
 	    double contribution=0.0, separation1, separation2;
-	    double total=0.0;
 	
       init = clock();
 	    for(int j=1; j<=Nrays; j++)
@@ -308,24 +304,16 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       deficitFlux[i] = (1.0-u1_-u2_)*F00;
     }
   }
-  //return;
-  //printf("should not reach here\n");
   /********************************************************/
   /*Deal with planet completely inside the star differently*/ 
   int flag = 0;
   init = clock();
-  int Nrays;
-	Nrays = 3000;
 	double eta1, eta2, theta, R, x, y,*etaa=new double[Nrays], *etab=new double[Nrays],d0;
 	double contribution=0.0, separation1, separation2;
   for (int i=0;i<np;i++){
-    //if(index[i]==1.0 and flag==0){
     if(index[i]==1.0 and flag==0){
-      //printf("I should be here\n");
       contribution = 0.0;
       for(int j=1; j<=Nrays;j++)
-      //int j = 1;
-      //while (j<=Nrays) /*make sure I got enough sampling*/
 	    {
         //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
 		    eta1 = Ran1_(&seed);
@@ -346,12 +334,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 		    contribution += LimbDarkening_(separation1);
         etaa[j]=eta1; etab[j]=eta2;
         flag = 1;
-        //if(i==230){
-        //  printf("%d %f %f %f %f %f %f %f\n", j, contribution, x, y, separation1,separation2, thetaa[i],thetab[i]);
-        //}
-        //j++;
-      }
-      //printf("%d %f %f %f\n", i, contribution,xc[i],yc[i]);
+    }
       d0 = d[i];
       double totalArea, Istar;
 	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
@@ -361,22 +344,13 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
     } else { 
       if (index[i]==1.0 and flag ==1){	
         contribution = 0.0;
-    //  //double correction = sqrt(d[i]*d[i]-b0*b0)-sqrt(d0*d0-b0*b0);
-    //  //printf("%d %f %f %f %f %f\n",i,phi[i],d0,correction,xc[i],yc[i]);
         for (int j=1;j<=Nrays;j++){
-    //    //x = x0[j]-correction; y = y0[j];
-    //    //x = x0[j]; y = y0[j];
-		//    eta1 = Ran1_(&seed);
-		//    eta2 = Ran1_(&seed);
-		//    theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
-		//    R = sqrt(eta1+(1-eta1)/epsilon2);
           if(etaa[j]==-1) continue;
           
 		      theta = (1.0-etab[j])*thetaa[i]+etab[j]*thetab[i];
 		      R = sqrt(etaa[j]+(1-etaa[j])/epsilon2);
 		      x = Req_*R*cos(theta);
 		      y = Rpole_*R*sin(theta);
-		//    //separation1 = (x-(xc[i]+correction))*(x-(xc[i]+correction))+(y-yc[i])*(y-yc[i]);
 		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
 		      contribution += LimbDarkening_(separation1);
         }
@@ -393,6 +367,13 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 
   printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
+  delete [] index;
+	delete [] xc;
+  delete [] yc;
+  delete [] thetaa; 
+  delete [] thetab;
+  delete [] etaa;
+  delete [] etab;
 }
 
 
