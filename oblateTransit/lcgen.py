@@ -36,12 +36,14 @@ def gentran(time,period,epoch,q):
 def trangen(time,mag,transit,lcflag=False):
     '''functions to generate fake lightcurves'''
     rmean = math.sqrt(transit.dip)
+    print rmean,transit.q*transit.P*24.
     f = transit.f
     inc = transit.inc*math.pi/180.
     alpha = transit.alpha*np.pi/180.
     u1 = transit.u1
     u2 = transit.u2
-    sma = 1./transit.q/np.pi
+    sma = 1./transit.q/np.pi/np.sin(inc)
+    print sma
     #print sma,transit.P,transit.u1,transit.u2,transit.epoch,transit.q,transit.qg
     req = rmean/math.sqrt(1-f)
     rpol = math.sqrt(1-f)*rmean
@@ -63,6 +65,8 @@ def trangen(time,mag,transit,lcflag=False):
     ind = phase>0.5
     phase[ind]-=1.0
     fkmag=medianmag+np.random.randn(len(time))*stdmag
+    fig=plt.figure()
+    ax = fig.add_subplot(111)
     if(lcflag):
         #initial short cadence data
         circularfluxmeanlc=medianmag+np.random.randn(len(time))*stdmag
@@ -97,8 +101,8 @@ def trangen(time,mag,transit,lcflag=False):
         residual = (fkmagsc-circularfluxmean)/1.e-6
         circularfluxmeanlc[intran] = binlc(time[intran],fktime[fkintran],circularfluxmean[fkintran]) + np.random.randn(len(time[intran]))*stdmag
         circularfluxmean = circularfluxmeanlc 
-        plt.plot(fkphase[fkintran],residual[fkintran],'r') 
-        plt.xlim([-0.01,0.01])
+        ax.plot(fkphase[fkintran],residual[fkintran],'r') 
+        ax.set_xlim([-0.01,0.01])
 
     else:
         dflux = np.zeros(len(time[intran]))
@@ -114,15 +118,32 @@ def trangen(time,mag,transit,lcflag=False):
         circularfluxmean,check = occultquad(z,u1,u2,rmean)
         circularfluxmean[index]=1.0
         
-        plt.plot(phase[intran],(circularfluxmean[intran]-circularflux[intran]+dflux)/1.e-6,'r')
-        plt.xlim([-0.01,0.01])
+        ax.plot(phase[intran],(circularfluxmean[intran]-circularflux[intran]+dflux)/1.e-6,'r')
+        ax.set_xlim([-0.01,0.01])
         fkmag[intran] = medianmag+np.random.randn(len(fkmag[intran]))*stdmag
         fkmag[intran]+=1-(circularflux[intran]-dflux)
         circularfluxmean=1-circularfluxmean+medianmag+np.random.randn(len(fkmag))*stdmag
-
-    plt.plot(phase[intran],(-circularfluxmean[intran]+fkmag[intran])/1.e-6,'o',mec='b',mfc='None',ms=1.5,mew=1)
+    ax.plot(phase[intran],(-circularfluxmean[intran]+fkmag[intran])/1.e-6,'o',mec='b',mfc='None',ms=1.5,mew=1)
+    ax.set_xlabel('phase')
+    ax.set_ylabel('residual(ppm)')
     plt.show()
-    
+    fig=plt.figure()
+    ax = fig.add_subplot(111)
+    #ax.plot(phase[intran]*transit.P*24.,circularfluxmean[intran],'o',mec='b',mfc='None',ms=1.5,mew=1)
+    ax.plot(phase[intran]*transit.P*24.,fkmag[intran],'.',mec='r')
+    #ax.plot(phase[intran],-circularfluxmean[intran]+mag[intran],'o',mec='b',mfc='None',ms=1.5,mew=1)
+    #ax.set_xlabel('phase')
+    #ax.set_ylabel('relativemag(ppm)')
+    #yformatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+    #ax.yaxis.set_major_formatter(yformatter)
+    plt.show()
+    #fig=plt.figure()
+    #ax = fig.add_subplot(111)
+    #ax.plot(phase[intran],-circularfluxmean[intran]+mag[intran]+medianmag+1-(circularflux[intran]-dflux),'o',mec='b',mfc='None',ms=1.5,mew=1)
+    #ax.set_xlabel('phase')
+    #ax.set_ylabel('relativemag(ppm)')
+    #plt.show()
+     
     return [fkmag,circularfluxmean]
 
 	
