@@ -13,7 +13,8 @@
 
 TBD.
 
-\section{Transit of An Oblate Planet}
+\section{Model}
+\subsection{Transit signals of oblate planets}
 
 In this paper, $f_\perp$ and $\theta_\perp$ are used to stand for the projected flattening and obliquity of a planet respectively, the same as in \citet{Carter2010}. Fig.~\ref{oblate-signals} shows the signals of oblateness for different $f_\perp$, $\theta_\perp$ and orbital inclination $i$, which are based on the algorithm developed in \citet{Carter2010}.
 
@@ -26,16 +27,70 @@ In this paper, $f_\perp$ and $\theta_\perp$ are used to stand for the projected 
 
 In this paper, we focus on the oblateness due to spin deformation (why, and the requirement on orbital period)
 
-\section{Detectability in \textit{Kepler} Data}
+
+
+\subsection{MCMC technique}
+\subsection{Validation of the dection capability}
+
 
 Impose an oblateness of 0.1 to the planet of kplr-6603043; 
 fit the mock data and recover the signal.
 
-\section{Fitting and Constraining the Sample Planets}
+\section{Data}
+
+We select Kepler planet candidates from Q1-Q16 with the following criterion: 
+
+a) planet radius smaller than 2.0 $R_J$; 
+
+b) planet period longer than 15 days; %might need to reduce to 7 days.
+
+c) the transit is not grazing ($b<0.8$?);  
+
+d) expected normalized signal to noise higher than?
+
+We define the normalized signal to noise to be 
+\begin{equation}
+NSN = (\frac{r_p/r_{\rm star}}{0.1})^2(\frac{ootv}{200{\rm ppm}})^{-1}\sqrt{N_{\rm tran}},
+\end{equation}
+in which, the out of transit variation $ootv$ is computed with the averaged 
+standard deviation before transit and after transit in a window with size of 
+half the transit duration. We use the theoretical residual amplitude 200 ppm 
+of a jupiter like planet transiting a solar type star with 
+$theta_\prep=45^{\circ}$ in our estimation. This residual amplitude scale with 
+the sqare of the planet star radius ratio.  
+The actual detection signal to noise should be $\sqrt{N_{\rm p}}*NSN$, in 
+which the number of points contribute to the residual signal per transit. 
+We assume most of the residual signal comes from ingress and egress of the 
+transit. 
+Therefore, for a jupiter size planet transit the midplane of a solar type 
+star with a period of 100 day, we expect the normalized signal to noize to be 
+7.4, and the actualy detection signal to noise to be 74.8.  
+
+
+We detrend all the available public Kepler \lcs\ for our analysis of the above targets. 
+To remove the stellar variability, we use the raw flux $(\rm SAP\_FLUX)$ obtained from the MAST archive
+\footnote{http://archive.stsci.edu/kepler/data$\_$search/search.php}, with the 
+out-of-transit variations corrected by the following steps from 
+\citet{Huang:2013}:
+
+a) removal of bad data points;
+
+b) correction of systematics due to various phenomena of the space craft, such as safe modes and tweaks;
+
+c) a set of cosine functions with minimum period of 1 day; 
+
+d) a 7th order polynomial fit over the out-of-transit regions. 
+
+
+\section{Result}
+
+\section{Discussion}
 
 
 \begin{thebibliography}{}
 \bibitem[Carter \& Winn(2010)]{Carter2010} Carter, J.~A., \& Winn, J.~N.\ 2010, \apj, 709, 1219
+\bibitem[{{Huang} {et~al.}(2013){Huang}, {Bakos}, \& {Hartman}}]{Huang:2013}
+{Huang}, X., {Bakos}, G.~{\'A}., \& {Hartman}, J.~D. 2013, \mnras, 429, 2001
 
 \end{thebibliography}
 

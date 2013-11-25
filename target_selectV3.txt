@@ -1,6 +1,7 @@
 #[1]      [2]         [3]     [4]          [5]       [6]
 #KIC     Period     rpstar   ootv       ranking    comments
 #D means drop
+# try to make the period cuts to 7 days and recompile this target list
 11147814 95.178324 0.132647 0.0003206 5.79426393445 #ch@D, EB,and grazing
 9278553 18.6100931 0.061765 0.0008706 2.24689561248 #ch@D, hot star
 6137704 178.267938 0.047882 0.0002207 2.22007023792 #ch@D, grazing
