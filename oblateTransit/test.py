@@ -14,7 +14,10 @@ def main():
     #rmean = 0.154679
     rmean = 0.08453
     f = 0.1
-    alpha =45./180.*np.pi
+    f2 = 0.12
+    #alpha =45./180.*np.pi
+    alpha =30./180.*np.pi
+    alpha2 =70./180.*np.pi
     #sma = 8.924
     sma = 49.584
     #period = 2.218573 
@@ -31,11 +34,13 @@ def main():
     dfluxF = np.zeros(Npoint)
     req = rmean/sqrt(1-f)
     rpol = sqrt(1-f)*rmean
+    req2 = rmean/sqrt(1-f2)
+    rpol2 = sqrt(1-f2)*rmean
     #initial
     start = time.clock()
     #print '0',time.time(),time.clock()
     obl = Obl.Oblateness(req,rpol,alpha,sma,inc,u1,u2)
-    oblf = OblF.Oblateness(req,rpol,alpha,sma,inc,u1,u2)
+    oblf = OblF.Oblateness(req2,rpol2,alpha2,sma,inc,u1,u2)
     print '0',time.time(),time.clock()-start
     b0 = sma*cos(inc)
     if(b0>(1+req)):
@@ -58,6 +63,7 @@ def main():
     #print '3',time.time(),time.clock()-start
     start = time.clock()
     circularflux = occultquad(z,u1,u2,rpol)[0]
+    circularflux2 = occultquad(z,u1,u2,rpol2)[0]
     print '3',time.time(),time.clock()-start
     index = np.cos(phi*2*np.pi)<0
     circularflux[index]=1.0
@@ -73,7 +79,7 @@ def main():
     #plt.plot(phi,circularflux-dflux/totalFlux)
     plt.xlim([-0.01,0.01])
     plt.plot(phi,(-circularfluxmean+circularflux-dflux/totalFlux)/1.e-6)
-    plt.plot(phi,(-circularfluxmean+circularflux-dfluxF/totalFlux)/1.e-6,'+')
+    plt.plot(phi,(-circularfluxmean+circularflux2-dfluxF/totalFlux)/1.e-6,'+')
     plt.show()
     return
 
