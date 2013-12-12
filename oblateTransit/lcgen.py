@@ -33,7 +33,7 @@ def gentran(time,period,epoch,q):
     return intran
 
 
-def trangen(time,mag,transit,lcflag=False):
+def trangen(time,mag,transit,lcflag=0):
     '''functions to generate fake lightcurves'''
     rmean = math.sqrt(transit.dip)
     print rmean,transit.q*transit.P*24.
@@ -67,14 +67,14 @@ def trangen(time,mag,transit,lcflag=False):
     fkmag=medianmag+np.random.randn(len(time))*stdmag
     fig=plt.figure()
     ax = fig.add_subplot(111)
-    if(lcflag):
+    if(lcflag==0):
         #initial short cadence data
         circularfluxmeanlc=medianmag+np.random.randn(len(time))*stdmag
         cadence = 1./60./24.
         nt = (int)((max(time)-min(time))/cadence)
         fktime = min(time)+np.arange(nt)*cadence
         fkmagsc=medianmag+np.random.randn(len(fktime))*stdmag
-        
+        #print 'doing sc stuff' 
         #initial short cadence pahse
         fkintran = gentran(fktime,transit.P,transit.epoch,transit.q) 
         fkphase = abs((fktime-transit.epoch)/transit.P)-(abs((fktime-transit.epoch)/transit.P)).astype(int)
@@ -87,9 +87,9 @@ def trangen(time,mag,transit,lcflag=False):
         obl.relativeFlux(fkphase[fkintran],fkdflux)
         #fkdflux/=totalFlux
         circularfluxmean = occultquad(z,u1,u2,rmean)[0]
-        circularfluxmean = 1-(1-circularfluxmean)/(totalFlux/np.pi)
+        #circularfluxmean = 1-(1-circularfluxmean)/(totalFlux/np.pi)
         circularflux = occultquad(z,u1,u2,rpol)[0]
-        circularflux = 1-(1-circularflux)/(totalFlux/np.pi)
+        #circularflux = 1-(1-circularflux)/(totalFlux/np.pi)
         index = np.cos(fkphase*2*np.pi)<0
         circularflux[index]=1.0
         circularfluxmean[index]=1.0
@@ -102,7 +102,9 @@ def trangen(time,mag,transit,lcflag=False):
         circularfluxmeanlc[intran] = binlc(time[intran],fktime[fkintran],circularfluxmean[fkintran]) + np.random.randn(len(time[intran]))*stdmag
         circularfluxmean = circularfluxmeanlc 
         ax.plot(fkphase[fkintran],residual[fkintran],'r') 
+        #ax.plot(fkphase[fkintran],fkmagsc[fkintran],'r') 
         ax.set_xlim([-0.01,0.01])
+        plt.show()
 
     else:
         dflux = np.zeros(len(time[intran]))
@@ -118,8 +120,12 @@ def trangen(time,mag,transit,lcflag=False):
         circularfluxmean,check = occultquad(z,u1,u2,rmean)
         circularfluxmean[index]=1.0
         
-        ax.plot(phase[intran],(circularfluxmean[intran]-circularflux[intran]+dflux)/1.e-6,'r')
+        #circularflux = 1-(1-circularflux)/(totalFlux/np.pi)
+        #circularfluxmean = 1-(1-circularfluxmean)/(totalFlux/np.pi)
+        ax.plot(phase[intran],circularfluxmean[intran],'r')
+        #ax.plot(phase[intran],(circularfluxmean[intran]-circularflux[intran]+dflux)/1.e-6,'r')
         ax.set_xlim([-0.01,0.01])
+        plt.show()
         fkmag[intran] = medianmag+np.random.randn(len(fkmag[intran]))*stdmag
         fkmag[intran]+=1-(circularflux[intran]-dflux)
         circularfluxmean=1-circularfluxmean+medianmag+np.random.randn(len(fkmag))*stdmag
@@ -157,15 +163,16 @@ def main():
     noplot=options.noplot
     cfgfile = options.cfg
     uflag = options.uflag
+    print cfgfile
     lcflag = int(cfgp.File_parse(cfgfile,'lcflag'))
     infile = cfgp.File_parse(cfgfile,'infile')
     inpath = cfgp.File_parse(cfgfile,'inpath')
     outfile = cfgp.File_parse(cfgfile,'outfile')
     coljd= int(cfgp.File_parse(cfgfile,'coljd'))
     colmag= int(cfgp.File_parse(cfgfile,'colmag'))
+    transit.readpara(cfgfile)
     if not inpath=='':
         os.chdir(inpath)
-    transit.readpara(cfgfile)
     time=[];readcolumn(time,coljd,infile);time=np.array(time)
     mag=[];readcolumn(mag,colmag,infile);mag=np.array(mag)
     fkmag,circularflux=trangen(time,mag,transit,lcflag=lcflag)

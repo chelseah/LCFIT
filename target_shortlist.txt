@@ -1,0 +1,10 @@
+KIC         KOI      MAG  Period
+11391018     K0189  14.388               #fitted with oblate, well constrained
+2987027     K0197   14.018             #fitted with oblate, not a good example, because of i0~90.0?
+4815520     K0367                 #variable, planet too small, Rp/Rstar = 0.04
+6526710     K0856   15.344        #interesting asymmetry, but low data quality, maybe deserve a try (no data)
+7906882     K0686   13.579  52.51 #under fitting; now alpha varies from -90 to 90
+9478990     K0423     #low data quality but dozens of transits available, a confirmed planet, deserve a try
+5283458     K1547   15.673  #deserve a try, with some transits removed (no data)
+9025971     K3680   14.524 #very good data quality but only a few transits, 141-day period, under fitting; the f-alpha plot looks terrible, because of i0~90?
+11242721   K763       #low data quality although dozens of transits available
