@@ -12,6 +12,24 @@ from scipy import stats
 import matplotlib
 import matplotlib.pyplot as plt
 
+def lspolyordern(x,y,n):
+    x=sp.array(x)
+    y=sp.array(y)
+    xi=sp.zeros(len(x))+1
+    A=(x**n)[:,np.newaxis]
+    for i in range(1,n):
+        A=np.hstack((A,(x**(n-i))[:,np.newaxis]))
+
+    A=np.c_[A,xi[:,np.newaxis]]
+    c,resid,rank,sigma = sp.linalg.lstsq(A,y)
+    z=sp.zeros(len(x))
+    for i in range(n+1):
+        z+=c[i]*x**(n-i)
+    return [z,c]
+
+
+
+
 def matrixgen(time,n,T):
 	'''generate least square fitting matrix with n cos filter,t is the total time span, formulism refer to Huang and Bacos (2012) eq [1]'''
 	tn=len(time)
@@ -30,7 +48,21 @@ def gentran(time,period,epoch,q):
     #print ftime[intran])
     return intran
 
+def lspolyrecon(otime,oflux,intran,order=7):
+    length=len(oflux)
+    ctime = otime[-intran]
+    cflux = oflux[-intran]-np.mean(oflux[-intran]) 
+    fitflux,c = lspolyordern(ctime,cflux,order)
+    rflux = np.zeros(length)
+    for i in range(order+1):
+        rflux +=c[i]*otime**(order-i) 
+    	
+    dflux=oflux-rflux
+    dflux-=np.mean(dflux)+np.mean(oflux)
+    
+    return dflux
 
+	
 def lssubrecon(otime,oflux,intran,n=30,noplot=True):
     length=len(oflux)
     ctime = otime[-intran]

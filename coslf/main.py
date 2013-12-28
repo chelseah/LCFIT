@@ -34,7 +34,8 @@ def main():
         outfile = cfgp.ltf_parse(cfgfile,'outfile')
     else:
         outfile = options.outfile 
-    
+
+    method = cfg.ltf_parse(cfgfile,'method')
     coljd = 1; colmag = 2 
     tmin=1.0
     if(uflag):
@@ -59,8 +60,11 @@ def main():
     #print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
     
     n=round((max(time)-min(time))/tmin)
+    if method == 'cos':
+        dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
+    if method == 'poly':
+        dflux=lspolyrecon(time,mag,intran)
 
-    dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
     dflux=dflux+(min(mag)-np.median(dflux))
     
     fout=open(outfile,mode='w')

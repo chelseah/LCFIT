@@ -20,6 +20,7 @@ def set_parse(infile):
     p.set('Section LTF','period','')
     p.set('Section LTF','epoch','')
     p.set('Section LTF','tdur','')
+    p.set('Section LTF','method','cos')
 
 #################### The General Setting part #############################
 	
