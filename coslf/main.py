@@ -13,6 +13,7 @@ def main():
     
     options = cmdp.ltf_parse()
     infileflag = options.infileflag
+    inlistflag = options.inlistflag
     outfileflag = options.outfileflag
     inpathflag = options.inpathflag
     noplot=options.noplot
@@ -25,6 +26,13 @@ def main():
         infile = cfgp.ltf_parse(cfgfile,'infile')
     else:
         infile = options.infile
+    
+    if(inlistflag):
+        inlist = cfgp.ltf_parse(cfgfile,'inlist')
+    else:
+        inlist = options.inlist
+
+    
 
     if(inpathflag):
         inpath = cfgp.ltf_parse(cfgfile,'inpath')
@@ -34,6 +42,12 @@ def main():
         outfile = cfgp.ltf_parse(cfgfile,'outfile')
     else:
         outfile = options.outfile 
+
+    if not inlist=='':
+        namelist = [];readcolumn(namelist,1,inlist,datformat='str')
+        print 'use default outfile extention .ltf'
+    elif not infile =='':
+        namelist=[infile]
 
     method = cfg.ltf_parse(cfgfile,'method')
     coljd = 1; colmag = 2 
@@ -46,32 +60,34 @@ def main():
     period = float(cfgp.ltf_parse(cfgfile,'period'))
     epoch = float(cfgp.ltf_parse(cfgfile,'epoch'))
     Tdur = float(cfgp.ltf_parse(cfgfile,'tdur'))
-    
-    time=[]
-    mag=[]
-    q = Tdur/period/24.
-    readcolumn(time,coljd,infile);time=np.array(time)
-    readcolumn(mag,colmag,infile);mag=np.array(mag)
-    #print len(time),len(mag),max(time),min(time)
-    intran = gentran(time,period,epoch,q)
-    #dip = np.mean(mag[intran])-np.mean(mag[-intran])
-    #dip = 0.00775
+   
+    for name in namelist:
+        time=[]
+        mag=[]
+        q = Tdur/period/24.
+        readcolumn(time,coljd,name);time=np.array(time)
+        readcolumn(mag,colmag,name);mag=np.array(mag)
+        #print len(time),len(mag),max(time),min(time)
+        intran = gentran(time,period,epoch,q)
+        #dip = np.mean(mag[intran])-np.mean(mag[-intran])
+        #dip = 0.00775
   
-    #print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
-    
-    n=round((max(time)-min(time))/tmin)
-    if method == 'cos':
-        dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
-    if method == 'poly':
-        dflux=lspolyrecon(time,mag,intran)
+        #print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
+        
+        n=round((max(time)-min(time))/tmin)
+        if method == 'cos':
+            dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
+        if method == 'poly':
+            dflux=lspolyrecon(time,mag,intran)
 
-    dflux=dflux+(min(mag)-np.median(dflux))
-    
-    fout=open(outfile,mode='w')
-    for i in range(len(time)):
-        line='%10.6f %10.6f\n' % (time[i],dflux[i])
-        fout.write(line)
-    fout.close()
+        dflux=dflux+(min(mag)-np.median(dflux))
+        if (not inlist ==''):
+            outfile = os.path.splitext(name)[0]+'.ltf'
+        fout=open(outfile,mode='w')
+        for i in range(len(time)):
+            line='%10.6f %10.6f\n' % (time[i],dflux[i])
+            fout.write(line)
+        fout.close()
     
     return	
 	

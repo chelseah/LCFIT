@@ -7,7 +7,7 @@ from dataio import *
 from HATlc import lightcurve as lc
 from HATlc import tran
 import random
-import oblateness as Obl
+import oblatenessfast as Obl
 from occultquad import occultquad
 #from Eastman_occultquad import occultquad
 import matplotlib
@@ -29,7 +29,7 @@ def gentran(time,period,epoch,q):
     ftime=(time-epoch-0.5*period)/period-((time-epoch-0.5*period)/period).astype(int)
     ind=ftime<0
     ftime[ind]+=1
-    intran=(ftime > (0.5-q/2.0))*(ftime < (0.5+q/2.0))
+    intran=(ftime > (0.5-1.2*q/2.0))*(ftime < (0.5+1.2*q/2.0))
     return intran
 
 
