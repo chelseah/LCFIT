@@ -49,7 +49,7 @@ def main():
     elif not infile =='':
         namelist=[infile]
 
-    method = cfg.ltf_parse(cfgfile,'method')
+    method = cfgp.ltf_parse(cfgfile,'method')
     coljd = 1; colmag = 2 
     tmin=1.0
     if(uflag):

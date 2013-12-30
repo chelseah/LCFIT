@@ -53,12 +53,12 @@ def simple():
     #infile = 'kplr006603043-2011177032512_llc.pflt'
     #infile = 'kplr006603043-2011073133259_llc.pflt'
     #infile = 'kplr006603043-2009166043257_llc.pflt'   
-    infile = 'kplr006603043-2009259160929_llc.pflt'
+    #infile = 'kplr006603043-2009259160929_llc.pflt'
     #infile = 'kplr006603043-2009350155506_llc.pflt'
     #infile = 'kplr006603043-2010078095331_llc.pflt'
     #infile = 'kplr006603043-2010174085026_llc.pflt'
     #infile = 'kplr006603043-2010265121752_llc.pflt'
-    #infile = 'kplr006603043-2010355172524_llc.pflt'
+    infile = 'kplr006603043-2010355172524_llc.pflt'
     outfile=''
     coljd=1
     colmag=2
