@@ -43,13 +43,7 @@ def main():
     else:
         outfile = options.outfile 
 
-    if not inlist=='':
-        namelist = [];readcolumn(namelist,1,inlist,datformat='str')
-        print 'use default outfile extention .ltf'
-    elif not infile =='':
-        namelist=[infile]
-
-    method = cfgp.ltf_parse(cfgfile,'method')
+        method = cfgp.ltf_parse(cfgfile,'method')
     coljd = 1; colmag = 2 
     tmin=1.0
     if(uflag):
@@ -60,7 +54,16 @@ def main():
     period = float(cfgp.ltf_parse(cfgfile,'period'))
     epoch = float(cfgp.ltf_parse(cfgfile,'epoch'))
     Tdur = float(cfgp.ltf_parse(cfgfile,'tdur'))
-   
+    
+    if not inpath=='':
+        os.chdir(inpath)
+    if not inlist=='':
+        namelist = [];readcolumn(namelist,1,inlist,datformat='str')
+        print 'use default outfile extention .ltf'
+    elif not infile =='':
+        namelist=[infile]
+
+
     for name in namelist:
         time=[]
         mag=[]
