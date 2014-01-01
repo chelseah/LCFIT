@@ -46,7 +46,7 @@ def simple():
     #infile='kplr006603043-2011024051157_slc.tab'
     #infile='kplr006603043-2013011073258_llc.tab'
     #infile='kplr006603043-2012277125453_llc.tab'
-    #infile='kplr006603043-2012179063303_llc.pflt'
+    infile='kplr006603043-2012179063303_llc.pflt'
     #infile='kplr006603043-2012088054726_llc.pflt'
     #infile='kplr006603043-2012004120508_llc.pflt'
     #infile = 'kplr006603043-2011271113734_llc.pflt'
@@ -58,7 +58,7 @@ def simple():
     #infile = 'kplr006603043-2010078095331_llc.pflt'
     #infile = 'kplr006603043-2010174085026_llc.pflt'
     #infile = 'kplr006603043-2010265121752_llc.pflt'
-    infile = 'kplr006603043-2010355172524_llc.pflt'
+    #infile = 'kplr006603043-2010355172524_llc.pflt'
     outfile=''
     coljd=1
     colmag=2
@@ -76,6 +76,8 @@ def simple():
     u2 = 0.289
     f = 0.1
     alpha =45./180.*np.pi
+    #f = 0.058
+    #alpha =11.22/180.*np.pi
     #f = 0.0
     #alpha =0./180.*np.pi
     req = rmean/sqrt(1-f)

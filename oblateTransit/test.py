@@ -10,6 +10,66 @@ import matplotlib
 from matplotlib import pyplot as plt
 import time
 
+def Scaling():
+    rmean = 0.1
+    period = 100.
+    u1 = 0
+    u2 = 0
+    #f = 0.1
+    #farr = (1+np.arange(5))/5.*0.2
+    #farr = (1+np.arange(10))/10.*0.2
+    farr = np.array([0.1])
+    alphaarr =(np.arange(50)/50.*180.-90)
+    #alphaarr = np.array([0])
+    sma = (period/365)**(2./3.)*1.5e13/7.e10
+    #inc = 89.709/180.*np.pi
+    b0arr = np.arange(51)/50.*0.8
+    #b0arr = np.array([0.1])
+    #b0 = 0.8
+    #b0 = sma*cos(inc)
+    #print sma,b0
+    Npoint = 1000
+    percent = 0.025
+    dflux = np.zeros(Npoint)
+    dfluxF = np.zeros(Npoint)
+    for k in xrange(len(b0arr)):
+        for i in xrange(len(alphaarr)):
+            for j in xrange(len(farr)):
+                f = farr[j]
+                alpha=alphaarr[i]/180.*np.pi
+                inc = np.arccos(b0arr[k]/sma)
+                b0 = b0arr[k]
+                req = rmean/sqrt(1-f)
+                rpol = sqrt(1-f)*rmean
+                oblf = OblF.Oblateness(req,rpol,alpha,sma,inc,u1,u2)
+                if(b0>(1+req)):
+                    print 'no transit happen'
+                    return
+                dphi = 2*percent/(Npoint-1)
+                totalFlux = np.pi*(1.0-u1/3-u2/6)
+                phi=-1*percent+dphi*np.arange(Npoint)
+                #call
+                oblf.relativeFlux(phi,dfluxF)
+                #print phi,dflux
+                z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc));
+                #z = abs(np.sin(phi*np.pi))*sma#/abs(np.sin(inc))
+                #print '3',time.time(),time.clock()-start
+                start = time.clock()
+                circularflux = occultquad(z,u1,u2,rpol)[0]
+                index = np.cos(phi*2*np.pi)<0
+                circularflux[index]=1.0
+                circularfluxmean = occultquad(z,u1,u2,rmean)[0]
+                circularfluxmean[index]=1.0
+                residual = (-circularfluxmean+circularflux-dfluxF/totalFlux)/1.e-6
+                #plt.xlim([-0.01,0.01])
+                ##plt.plot(phi,circularfluxmean)
+                #plt.plot(phi,residual)
+                #plt.show()
+                print alphaarr[i],farr[j],b0arr[k],max(residual) 
+    return
+
+
+
 def main():
     #rmean = 0.154679
     rmean = 0.08453
@@ -84,4 +144,5 @@ def main():
     return
 
 if __name__=='__main__':
-    main()
+    #main()
+    Scaling()

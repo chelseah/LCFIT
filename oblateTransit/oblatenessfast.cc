@@ -37,7 +37,7 @@ double Oblateness::Ran1_(long *idum)
   if ((temp=AM*iy) > RNMX) return RNMX;
   else return temp;
 }
-static long seed=0;
+//static long seed=time(NULL);
 
 /* limb darkening function */
 double Oblateness::LimbDarkening_(double r2)
@@ -163,7 +163,15 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
   double contribution=0.0, separation1, separation2;
   int Nrays = 3000; //hard wire in sample parameters
   double *etaa=new double[Nrays], *etab=new double[Nrays];
+  long seed=time(NULL);
   //printf("%x %x %x %x %x %x\n",d,index,xc,yc,etaa,etab);
+  double phimin = 5.;
+  for(int i=0;i<np;i++){
+    if (fabs(phi[i])<phimin){
+      phimin = fabs(phi[i]);
+    }
+  }
+  
   for (int i=0;i<np;i++){
     /* distance between centers of the planet and the star */
     init = clock();
@@ -215,6 +223,11 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
 	  	theta2 = 2*pi;
 		  F00 = pi*Rpole_*(Req_-Rpole_);
 	    index[i] = 1.0;
+      if (fabs(phi[i])<1.e-5 or fabs(phi[i])==phimin){
+        index[i] = 2.0;
+        //printf("%d %f\n",i,phi[i]);
+        
+      }
     } else {
       index[i] = 0.0;
     }
@@ -306,60 +319,73 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       deficitFlux[i] = (1.0-u1_-u2_)*F00;
     }
   }
-  //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   /********************************************************/
   /*Deal with planet completely inside the star differently*/ 
-  int flag = 0;
   init = clock();
   //double contribution=0.0, separation1, separation2;
+  double Ntryin = 0;
   for (int i=0;i<np;i++){
-    if(index[i]==1.0){
-      //printf("%d %f %f\n",i,thetaa[i],thetab[i]);
-      if(flag==0){
+    if(index[i]==2.0){
+      contribution = 0.0;
+      double totalArea, Istar;
+      seed=time(NULL);
+      for(int ntry=0;ntry<20;ntry++){
+	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
+      for(int j=0; j<Nrays;j++)
+	    {
+		    eta1 = Ran1_(&seed);
+		    eta2 = Ran1_(&seed);
+		    theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
+		    R = sqrt(eta1+(1-eta1)/epsilon2);
+		    x = Req_*R*cos(theta);
+		    y = Rpole_*R*sin(theta);
+		    etaa[j]=-1; etab[j]=-1; 
+        /* distance to the center of the star */
+		    separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+		    separation2 = x*x+y*y;
+        //printf("%d %d %f %f %f %f %f %f %f %f %f %f\n",i,j,phi[i],xc[i],yc[i],separation1,separation2,Rpole_*Rpole_,thetaa[i],thetab[i],eta1,eta2);
+		    /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
+		    if(separation1 > 1.0) continue;
+		    /* distance to the center of the planet */
+		    if(separation2 < Rpole_*Rpole_) continue;
+		    /* otherwise, add its contribution on */
+		    contribution += LimbDarkening_(separation1);
+        etaa[j]=eta1; etab[j]=eta2;
+        Ntryin++;
+      }
+      }
+      Ntryin/=20.;
+      //printf("%f\n",Ntryin);
+      break;
+    }
+  }
+  for (int i=0;i<np;i++){
+      if (index[i]>0.0){	
         contribution = 0.0;
-        for(int j=0; j<Nrays;j++)
-	      {
-		      eta1 = Ran1_(&seed);
-		      eta2 = Ran1_(&seed);
-		      theta = (1.0-eta2)*thetaa[i]+eta2*thetab[i];
-		      R = sqrt(eta1+(1-eta1)/epsilon2);
-		      x = Req_*R*cos(theta);
-		      y = Rpole_*R*sin(theta);
-		      etaa[j]=-1; etab[j]=-1; 
-          /* distance to the center of the star */
-		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
-		      /* if the ray locates outside the stellar plane, or inside the circular plane of planet, ignore it */
-		      if(separation1 > 1.0) continue;
-		      /* distance to the center of the planet */
-		      separation2 = x*x+y*y;
-		      if(separation2 < Rpole_*Rpole_) continue;
-		      /* otherwise, add its contribution on */
-		      contribution += LimbDarkening_(separation1);
-          etaa[j]=eta1; etab[j]=eta2;
-        }
-        flag = 1;
-      } else {  
-        contribution = 0.0;
+        double Nreal = 0;
         for (int j=0;j<Nrays;j++){
           if(etaa[j]==-1) continue;
-           
+          
 		      theta = (1.0-etab[j])*thetaa[i]+etab[j]*thetab[i];
 		      R = sqrt(etaa[j]+(1-etaa[j])/epsilon2);
 		      x = Req_*R*cos(theta);
 		      y = Rpole_*R*sin(theta);
 		      separation1 = (x-xc[i])*(x-xc[i])+(y-yc[i])*(y-yc[i]);
+          //separation2 = x*x+y*y;
+          //if(separation1>1 and separation2<Rpole_*Rpole_){
+          //printf("%f %f %f\n",separation1,separation2,Rpole_*Rpole_);}
 		      contribution += LimbDarkening_(separation1);
+          Nreal++;
         }
-      }
       double totalArea, Istar;
 	    totalArea = (thetab[i]-thetaa[i])*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
-	    Istar = contribution*totalArea/Nrays;
+	    Istar = contribution/Nreal*Ntryin*totalArea/Nrays;
 	    deficitFlux[i] += Istar;
-    }
+
+      }
   }
   final = clock()-init;
   clc3+=((double)final/((double)CLOCKS_PER_SEC));
-  //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
 
   //printf("three zones: %f %f %f\n",clc1,clc2,clc3);
   delete [] d;
