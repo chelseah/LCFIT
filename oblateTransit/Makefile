@@ -1,5 +1,7 @@
 OBJECT = oblatenessfast.o main.o
 PROJECT = oblateness
+OBJECT_DEBUG = oblatenessfast.o testinter.o
+PROJECT_DEBUG = testinter
 OBL_INTERFACES = oblateness.i
 OBLFAST_INTERFACES = oblatenessfast.i
 ELL_INTERFACES = elliptic.i
@@ -25,9 +27,17 @@ cc: $(PROJECT)
 $(PROJECT) :$(OBJECT)
 	$(CXX) -pg -o $@ $^
 
+#.PHONY: test
+#test: $(PROJECT_DEBUG)
+#
+#$(PROJECT_DEBUG) :$(OBJECT_DEBUG)
+#	$(CXX) -pg -o $@ $^
+
+
 .PHONY: clean
 clean:
 	$(RM) $(PROJECT)
+	$(RM) $(PROJECT_DEBUG)
 	$(RM) *.so *.pyc *_wrap.h
 	$(RM) -r *.dSYM
 	$(RM) -r build

@@ -1,4 +1,4 @@
-#include"oblateness.h"
+#include"oblatenessfast.h"
 Oblateness::Oblateness(double Req, double Rpole, double alpha, double sma, double inc, double u1, double u2):Req_(Req),Rpole_(Rpole),alpha_(alpha),sma_(sma),inc_(inc),u1_(u1),u2_(u2){
   AM=1.0/IM;
   NDIV=(1+(IM-1)/NTAB);
@@ -80,6 +80,9 @@ void Oblateness::FindRoot_(double x1, double y1, double x2, double y2, double xc
 	}
 }
 
+
+
+
 /* find the intersection points on the ellipse */
 void Oblateness::IntersectionPoints_(double *x, double *y, int *n, double a, double b, double xc, double yc)
 {
@@ -88,6 +91,7 @@ void Oblateness::IntersectionPoints_(double *x, double *y, int *n, double a, dou
 	double xval, yval;
 	double x1, y1, x2, y2;
 	int flag;
+  flag = 0;
 	for(i=0; i<N; i++)
 	{
 		phi1 = i*dphi; phi2 = (i+1)*dphi;
@@ -95,14 +99,22 @@ void Oblateness::IntersectionPoints_(double *x, double *y, int *n, double a, dou
 		y1 = b*sin(phi1); y2 = b*sin(phi2);
 		FindRoot_(x1, y1, x2, y2, xc, yc, &xval, &yval, &flag);
 		if(flag == 0) continue;
-		if(count > 1) {printf("More intersection points than expected!\n"); exit(1);}
+		if(count > 1) {
+      printf("x1=%f,y1=%f,x2=%f,y2=%f\n",x1,y1,x2,y2);
+      printf("xc=%f,yc=%f\n",xc,yc);
+      printf("x=%f,y=%f\n",xval,yval);
+      printf("req=%f,rpol=%f,alpha=%f,inc=%f\n",Req_,Rpole_,alpha_,inc_);
+      printf("More intersection points than expected!\n"); 
+      flag=-999;    
+      exit(1);
+    }
 		x[count] = xval; y[count] = yval; count++;
 		/* there is one intersection point between (x1,y1) and (x2,y2) */
 	}
 	*n = count;
 	return;
 }
-
+//
 /* area calculation */
 double Oblateness::TriangleArea_(double *x, double *y)
 {

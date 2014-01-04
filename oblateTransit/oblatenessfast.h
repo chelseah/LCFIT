@@ -12,6 +12,7 @@ class Oblateness{
     Oblateness(double Req, double Rpole, double alpha, double sma, double inc, double u1, double u2);
     ~Oblateness();
     void relativeFlux(double *phi, int np, double *deficitFlux, int nf);
+//    void testIntersec();
   private:
     double Ran1_(long *idum);
     double LimbDarkening_(double r2);
