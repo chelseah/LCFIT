@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import Zeipel
+import pyZeipel as Zeipel
 from occultquad import occultquad
 import numpy as np
 import scipy as sp
@@ -43,7 +43,7 @@ def int_area():
         x0 = x*cos(y)
         y0 = x*sin(y)
         #print x0,y0
-        g = Zeipel.cal_geff(x0,y0,fratio,phi,1.,ggraveq,groteq)
+        g = Zeipel.cal_geff(x0,y0,fratio,phi,Req,ggraveq,groteq)
         return g**beta
     area = dblquad(lambda x,y: x*f(x,y),0,2.*np.pi,lambda x: 0,lambda x: Req)
     print area[0]/np.pi
@@ -60,8 +60,8 @@ def testgd(b):
     Tpole = 8450
     #theta = 90.0
     theta = 0.0
-    #phi = 0.0
-    phi = 30./180.*math.pi
+    phi = 0.0
+    #phi = 30./180.*math.pi
     #phi = 90./180.*math.pi
     #inc = 90.0/180.*math.pi
     #inc = np.arccos(Req*b*rsun/a/AU)
@@ -95,7 +95,7 @@ def testgd(b):
     #y = -1*x*tan(theta)+rsun*Req*b*cos(theta)+rsun*Req*b*sin(theta)*tan(theta)
     x = phase*2.*math.pi*a*AU*cos(theta)-Rpole*rsun*b*sin(theta)
     #y = -1*x*tan(theta)+rsun*Rpole*b*cos(theta)+rsun*Rpole*b*sin(theta)*tan(theta)
-    y = -phase*2.*math.pi+a*AU*sin(theta)+rsun*Rpole*b*cos(theta)
+    y = -phase*2.*math.pi*a*AU*sin(theta)+rsun*Rpole*b*cos(theta)
     #x = x/(rsun*Req)
     #y = y/(rsun*Req)
     x = x/(rsun)
@@ -134,8 +134,8 @@ def testgd(b):
     return model
 
 def main():
-    barr = np.array([-0.6,-0.3,0,0.3,0.6])
-    #barr = np.array([0,0.3,0.6])
+    #barr = np.array([-0.6,-0.3,0,0.3,0.6])
+    barr = np.array([0,0.3,0.6])
     #barr = np.array([0.0])
     for b in barr:
         model = testgd(b)

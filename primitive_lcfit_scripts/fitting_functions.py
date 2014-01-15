@@ -1,4 +1,5 @@
 import os
+import transitdata as data
 import sys
 from numpy import *
 import matplotlib.pyplot as plt

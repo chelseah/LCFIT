@@ -5,3 +5,4 @@ day=24*hour
 rsun=6.955e10
 G = 6.67e-8
 rearth = 6.371e8
+AU = 1.5e13
