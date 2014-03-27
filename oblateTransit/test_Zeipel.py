@@ -23,9 +23,11 @@ def testgd(b,phi,theta):
     a = 0.05
     P = 3.04
     beta = 0.19
+    #beta = 0.08
     fratio = 0.1947
     Ms = 1.8
     Req = 2.029
+    #Req = 1.0
     Rpole = Req*(1-fratio)
     Tpole = 8450
     u1 = 0.32; u2 = 0.32
@@ -59,7 +61,7 @@ def testgd(b,phi,theta):
     #input b*Rpole(in rsun,see above) instead of b
     gdmodel.Cal_F(phase,F,theta,a*AU/rsun,b*Rpole)
     lum = gdmodel.Cal_Lum()
-    print lum/gpole**(4.*beta)/(4./3*np.pi*Req**3.)
+    print lum/gpole**(4.*beta)/(4.*np.pi*Req**3.)
     #correct the circular model
     model = (circularflux-max(circularflux))*F+1
 

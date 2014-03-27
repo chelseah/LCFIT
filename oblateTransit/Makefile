@@ -10,6 +10,14 @@ OBL_SOURCES= oblateness.cc oblateness.h
 OBLFAST_SOURCES= oblatenessfast.cc oblatenessfast.h
 ZEIPEL_SOURCES = quadpolar.cc quadsphere.cc Zeipelmodel.cc Zeipel.cc Zeipelmodel.h Zeipel.h model.h quadpolar.h quadsphere.cc integrator.h
 ELL_SOURCES = elliptic.cc elliptic.h
+OBL_WRAPPERS = $(OBL_INTERFACES:.i=_wrap.cxx)
+OBL_PROXIES = $(OBL_INTERFACES:.i=.py)
+ZEIPEL_WRAPPERS = $(ZEIPEL_INTERFACES:.i=_wrap.cxx)
+ZEIPEL_PROXIES = $(ZEIPEL_INTERFACES:.i=.py)
+OBLFAST_WRAPPERS = $(OBLFAST_INTERFACES:.i=_wrap.cxx)
+OBLFAST_PROXIES = $(OBLFAST_INTERFACES:.i=.py)
+ELL_WRAPPERS = $(ELL_INTERFACES:.i=_wrap.cxx)
+ELL_PROXIES = $(ELL_INTERFACES:.i=.py)
 SOURCES = $(OBL_SOURCES) $(ELL_SOURCES) $(OBLFAST_INTERFACES) $(ZEIPEL_SOURCES)
 INTERFACES = $(OBL_INTERFACES) $(ELL_INTERFACES) $(OBLFAST_INTERFACES) $(ZEIPEL_INTERFACES)
 WRAPPERS = $(INTERFACES:.i=_wrap.cxx)

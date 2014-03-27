@@ -25,6 +25,8 @@ def set_parse(infile):
     p.set('Section TransitParams','inc','')
     p.set('Section TransitParams','u1','')
     p.set('Section TransitParams','u2','')
+    p.set('Section TransitParams','q1','')
+    p.set('Section TransitParams','q2','')
     p.set('Section TransitParams','starf','')
     p.set('Section TransitParams','planetf','')
     p.set('Section TransitParams','alpha','')

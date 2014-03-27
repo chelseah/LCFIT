@@ -1,0 +1,27 @@
+1) make cc
+compile with make cc to see if the cc files is portable to local computer
+
+The correct output of testquad should be the following:
+#####################################################
+-----------test polynomial--------------------------
+coeff=2.000000,x=2.000000,answer=2.000000
+coeff=2.000000,3.000000,x=2.000000,answer=8.000000
+coeff=2.000000,3.000000,4.000000,x=2.000000,answer=24.000000
+-----------test quad--------------------------
+coeff=2.000000,3.000000,4.000000,x1=1.000000,x2=2.000000, fx=0.347373
+-----------test quad2d--------------------------
+x1=0.000000,x2=2.000000,y1=0.000000,y2=6.283185, fx=12.566371
+-----------test quad3d--------------------------
+x1=0.000000,x2=2.000000,y1=0.000000,y2=6.283185, z1=0.000000,z2=0.000000,fx=33.510322
+#####################################################
+
+2) make 
+this use swig to build the python part.
+
+3) test_Zeipel.py is a example showing how to use the class Zeipel
+it should show a figure with three lightcurves with different depth and width
+and also print out the luminosity and flux ratio for each group; since the lightcurve is computed with the star stays the same, the L and F0 number should be the same.
+
+TOBEDONE:
+1) need a public function for Zeipel to output temperature at any point of the surface.
+2) need to put the more accurate GD model in this package as well. 

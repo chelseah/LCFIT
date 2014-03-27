@@ -43,7 +43,7 @@ def main():
     else:
         outfile = options.outfile 
 
-        method = cfgp.ltf_parse(cfgfile,'method')
+    method = cfgp.ltf_parse(cfgfile,'method')
     coljd = 1; colmag = 2 
     tmin=1.0
     if(uflag):
@@ -55,14 +55,14 @@ def main():
     epoch = float(cfgp.ltf_parse(cfgfile,'epoch'))
     Tdur = float(cfgp.ltf_parse(cfgfile,'tdur'))
     
-    if not inpath=='':
-        os.chdir(inpath)
     if not inlist=='':
         namelist = [];readcolumn(namelist,1,inlist,datformat='str')
         print 'use default outfile extention .ltf'
     elif not infile =='':
         namelist=[infile]
 
+    if not inpath=='':
+        os.chdir(inpath)
 
     for name in namelist:
         time=[]
@@ -85,7 +85,9 @@ def main():
 
         dflux=dflux+(min(mag)-np.median(dflux))
         if (not inlist ==''):
-            outfile = os.path.splitext(name)[0]+'.ltf'
+            #outfile = os.path.splitext(name)[0]+'.ltf'
+            outfile = name+'.ltf'
+        print outfile
         fout=open(outfile,mode='w')
         for i in range(len(time)):
             line='%10.6f %10.6f\n' % (time[i],dflux[i])

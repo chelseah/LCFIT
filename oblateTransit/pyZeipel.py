@@ -89,7 +89,10 @@ def Zeipel():
     M = 1.8; Req0 = 2.029 ; #M is in solar mass and R is is solar radius 
     f = 0.1947
     #f = 0.5
-    Tpole = 8450; beta = 0.1947; 
+    Tpole = 8450; 
+    #beta = 0.1947; 
+    beta = 0.08; 
+    #beta = 0.25
     Protot = 8.2 #Protot is in hour
     G_MRsun_hour = 4*math.pi**2*(1.5e3/7)**3./(365.*24.)**2
     Omega = 2*math.pi/Protot
@@ -121,7 +124,7 @@ def Zeipel():
         ax = fig.add_subplot(index)
         exterior = np.sqrt(((X/Req)**2) + ((Y/Rpole)**2)) > 1.0
         T_mask = np.ma.masked_array(T,mask=exterior)
-        CS = ax.contourf(X*Req0,Y*Req0,T,cmap=cm.copper)
+        CS = ax.contourf(X*Req0,Y*Req0,T_mask,cmap=cm.copper)
         cbar = plt.colorbar(CS)
         ax.set_xlim([-3,3])
         ax.set_ylim([-3,3])

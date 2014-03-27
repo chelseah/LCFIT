@@ -18,14 +18,14 @@ def Scaling():
     u2 = 0
     #f = 0.1
     #farr = (1+np.arange(5))/5.*0.2
-    #farr = (1+np.arange(10))/10.*0.2
-    farr = np.array([0.1])
+    farr = (1+np.arange(10))/10.*0.2
+    #farr = np.array([0.1])
     #alphaarr =(np.arange(50)/50.*180.-90)
     alphaarr = np.array([45])
     sma = (period/365)**(2./3.)*1.5e13/7.e10
     #inc = 89.709/180.*np.pi
-    #b0arr = np.arange(51)/50.*0.8
-    b0arr = np.array([0.5])
+    b0arr = -0.8+np.arange(101)/100.*1.6
+    #b0arr = np.array([0.5])
     #b0 = 0.8
     #b0 = sma*cos(inc)
     #print sma,b0
@@ -77,16 +77,17 @@ def main():
     #rmean = 0.154679
     rmean = 0.08453
     f = 0.1
-    f2 = 0.12
+    f2 = 0.1
     #alpha =45./180.*np.pi
-    alpha =30./180.*np.pi
+    alpha =-70./180.*np.pi
     alpha2 =70./180.*np.pi
     #sma = 8.924
     sma = 49.584
     #period = 2.218573 
     period = 110.3216229
     #inc = 85.749/180.*np.pi
-    inc = 89.209/180.*np.pi
+    #inc = 89.209/180.*np.pi
+    inc = 89.51/180.*np.pi
     #inc = 90./180.*np.pi
     u1 = 0.242
     u2 = 0.289
@@ -106,6 +107,7 @@ def main():
     oblf = OblF.Oblateness(req2,rpol2,alpha2,sma,inc,u1,u2)
     print '0',time.time(),time.clock()-start
     b0 = sma*cos(inc)
+    print b0
     if(b0>(1+req)):
         print 'no transit happen'
         return
@@ -147,5 +149,5 @@ def main():
     return
 
 if __name__=='__main__':
-    #main()
-    Scaling()
+    main()
+    #Scaling()
