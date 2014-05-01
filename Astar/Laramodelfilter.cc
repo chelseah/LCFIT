@@ -39,13 +39,29 @@ double LaraModelfilter::Readfilter_(double g, double T, double phi){
   indx_g = (int)((g-x1_)/dx_+0.5);
   indx_T = (int)((T-y1_)/dy_+0.5);
   indx_phi = (int)((phi-z1_)/dz_+0.5);
-  if(indx_g>=nx){
-    indx_g=nx-1;
-    printf("Warning: g index out of bound!\n")
+  if(indx_g>=nx_){
+    indx_g=nx_-1;
+    printf("Warning: g index out of bound on the high side!\n");
   }
   if(indx_g<0){
     indx_g=0;
-    printf("Warning: g index out of bound!\n")
+    printf("Warning: g index out of bound on the low side!\n");
+  }
+  if(indx_T>=ny_){
+    indx_T=ny_-1;
+    printf("Warning: T index out of bound on the high side!\n");
+  }
+  if(indx_T<0){
+    indx_T=0;
+    printf("Warning: T index out of bound on the low side!\n");
+  }
+  if(indx_phi>=nz_){
+    indx_phi=nz_-1;
+    printf("Warning: mu index out of bound on the high side!\n");
+  }
+  if(indx_phi<0){
+    indx_phi=0;
+    printf("Warning: mu index out of bound on the low side!\n");
   }
   //printf("%f %f %f %f %f %d %d %d, %d %d %d\n",g, T, phi,z1_, dz_,indx_g,indx_T,indx_phi, nx_, ny_, nz_);
   //printf("%f %f %f %f %d %d %d, %d %d %d %f\n",g, T, y1_, dy_,indx_g,indx_T,indx_phi, nx_, ny_, nz_,filter_[indx_phi+indx_T*nz_+indx_g*ny_*nz_]);

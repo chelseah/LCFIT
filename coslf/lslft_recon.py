@@ -48,15 +48,21 @@ def gentran(time,period,epoch,q):
     #print ftime[intran])
     return intran
 
-def lspolyrecon(otime,oflux,intran,order=7):
+def lspolyrecon(otime,oflux,intran,order=11):
     length=len(oflux)
     ctime = otime[-intran]
-    cflux = oflux[-intran]-np.mean(oflux[-intran]) 
+    cflux = sp.signal.medfilt(oflux[-intran]-np.mean(oflux[-intran]),51) 
     fitflux,c = lspolyordern(ctime,cflux,order)
     rflux = np.zeros(length)
     for i in range(order+1):
         rflux +=c[i]*otime**(order-i) 
-    	
+    
+    if(True):
+        fig=plt.figure()
+        ax = fig.add_subplot(1,1,1)
+        ax.plot(otime,rflux,'.',ctime,cflux,'x')
+        plt.show()
+    		
     dflux=oflux-rflux
     dflux-=np.mean(dflux)+np.mean(oflux)
     

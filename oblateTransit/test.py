@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import scipy as sp
-from math import sqrt,cos
+from math import sqrt,cos,acos
 import oblateness as Obl
 import oblatenessfast as OblF
 from occultquad import occultquad
@@ -79,8 +79,8 @@ def main():
     f = 0.1
     f2 = 0.1
     #alpha =45./180.*np.pi
-    alpha =-70./180.*np.pi
-    alpha2 =70./180.*np.pi
+    alpha =21./180.*np.pi
+    alpha2 =90./180.*np.pi
     #sma = 8.924
     sma = 49.584
     #period = 2.218573 
@@ -89,8 +89,10 @@ def main():
     #inc = 89.209/180.*np.pi
     inc = 89.51/180.*np.pi
     #inc = 90./180.*np.pi
-    u1 = 0.242
-    u2 = 0.289
+    #u1 = 0.242
+    #u2 = 0.289
+    u1 = 0.
+    u2 = 0.
     Npoint = 1000
     percent = 0.025
     #percent = 1.0
@@ -107,7 +109,7 @@ def main():
     oblf = OblF.Oblateness(req2,rpol2,alpha2,sma,inc,u1,u2)
     print '0',time.time(),time.clock()-start
     b0 = sma*cos(inc)
-    print b0
+    print 'b0',b0,acos(b0)/np.pi*180.
     if(b0>(1+req)):
         print 'no transit happen'
         return

@@ -125,10 +125,10 @@ def Zeipel():
         exterior = np.sqrt(((X/Req)**2) + ((Y/Rpole)**2)) > 1.0
         T_mask = np.ma.masked_array(T,mask=exterior)
         CS = ax.contourf(X*Req0,Y*Req0,T_mask,cmap=cm.copper)
-        cbar = plt.colorbar(CS)
         ax.set_xlim([-3,3])
         ax.set_ylim([-3,3])
         ax.add_patch(ellipse)
+    cbar = plt.colorbar(CS)
     plt.show()
      
     return
