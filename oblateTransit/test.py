@@ -52,7 +52,8 @@ def Scaling():
                     totalFlux = np.pi*(1.0-u1/3-u2/6)
                     phi=-1*percent+dphi*np.arange(Npoint)
                     #call
-                    oblf.relativeFlux(phi,dfluxF)
+                    scale = np.zeros(len(phi))+1.
+                    oblf.relativeFlux(phi,scale,dfluxF)
                     #print phi,dflux
                     z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc));
                     #z = abs(np.sin(phi*np.pi))*sma#/abs(np.sin(inc))
@@ -119,10 +120,11 @@ def main():
     #call
     start = time.clock()
     #print '1',time.time(),time.clock()-start
-    obl.relativeFlux(phi,dflux)
+    scale = np.zeros(len(phi))+1.
+    obl.relativeFlux(phi,scale,dflux)
     print '1old',time.time(),time.clock()-start
     start = time.clock()
-    oblf.relativeFlux(phi,dfluxF)
+    oblf.relativeFlux(phi,scale,dfluxF)
     print '1',time.time(),time.clock()-start
     #print phi,dflux
     z=sma*np.sqrt(np.sin(phi*2*np.pi)*np.sin(phi*2*np.pi)+np.cos(phi*2*np.pi)*np.cos(phi*2*np.pi)*cos(inc)*cos(inc));

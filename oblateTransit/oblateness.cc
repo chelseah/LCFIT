@@ -135,7 +135,7 @@ double Oblateness::CircleChordArea_(double *x, double *y, double xc, double yc, 
 }
 
 /* calculate the deficite flux of the star at phase phi */
-void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
+void Oblateness::relativeFlux(double *phi, int np, double *smaarr, int ns, double *deficitFlux, int nf)
 //void relativeFlux(double *variables, int n, double phi, double *deficitFlux, double *circleAnalogy)
 {
 	/* variables */
@@ -162,7 +162,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *deficitFlux, int nf)
       deficitFlux[i] = 0.0;
       continue;
     }
-    d[i]=sma_*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
+    d[i]=sma_*smaarr[i]*sqrt(sin(phi[i]*2*pi)*sin(phi[i]*2*pi)+cos(phi[i]*2*pi)*cos(phi[i]*2*pi)*cos(inc_)*cos(inc_));
 	
 	  /* the embedded sphere's contribution */
 	  //*circleAnalogy = standardCurve(variables[1], d, variables[6], variables[7]);
