@@ -47,6 +47,7 @@ int main()
 	}
 	double dphi = 2*percent/(variables[8]-1);
 	double* phi = new double [N];
+	double* smaarr = new double [N];
   double* deficitFlux = new double [N];
 	double totalFlux,  amp, circleAnalogy;
 	FILE *lc;
@@ -58,10 +59,11 @@ int main()
 	totalFlux = pi*(1.0-variables[6]/3-variables[7]/6);
   for(int i =0;i<N;i++){
     phi[i]=-1*percent+dphi*i;
+    smaarr[i]=1.;
   }
 		/* functions to calculate the relative flux at this moment */
   init= clock();
-	obl.relativeFlux(phi,N, deficitFlux, N);
+	obl.relativeFlux(phi,N, smaarr,N, deficitFlux, N);
   final= clock()-init;
   printf("total: %f\n", (double)final/(double)CLOCKS_PER_SEC);
   //std::cout << (double)final / ((double)CLOCKS_PER_SEC);

@@ -8,6 +8,63 @@ Oblateness::Oblateness(double Req, double Rpole, double alpha, double sma, doubl
 Oblateness::~Oblateness(){
 }
 
+void Oblateness::Sobseq_(int *n, double x[]){
+  int j,k,l;
+  unsigned long i,im,ipp;
+  static float fac;
+  static unsigned long in,ix[MAXDIM+1], *iu[MAXBIT+1];
+  static unsigned long mdeg[MAXDIM+1] = {0,1,2,3,3,4,4};
+  static unsigned long ip[MAXDIM+1] = {0,0,1,1,2,1,4};
+  static unsigned long iv[MAXDIM*MAXBIT+1] = {
+   0,1,1,1,1,1,1,3,1,3,3,1,1,5,7,7,3,3,5,15,11,5,15,13,9};
+ // printf("in Sobseq\n"); 
+  if (*n <0){
+    //printf("n=%d\n",*n);
+    for (k=1; k<MAXDIM;k++) ix[k]=0;
+    in = 0;
+    if (iv[1] !=1) return;
+    fac = 1.0/(1L <<MAXBIT);
+    for (j=1,k=0;j<=MAXBIT;j++,k+=MAXDIM) iu [j] = &iv[k];
+    //printf("in Sobseq,2\n"); 
+    for (k=1;k<=MAXDIM;k++){
+      for (j=1; j<=mdeg[k];j++) iu[j][k] <<=(MAXBIT-j);
+      //printf("in Sobseq,3\n"); 
+      for (j=mdeg[k]+1;j<=MAXBIT;j++){
+        //printf("j=%d,k=%d\n",j,k);
+        ipp=ip[k];
+        i=iu[j-mdeg[k]][k];
+        //printf("i=%d\n",i);
+        i ^=(i>>mdeg[k]);
+        //printf("i=%d\n",i);
+        //printf("mdeg[k]=%d\n",mdeg[k]);
+        for (l=mdeg[k]-1;l>=1;l--){
+          //printf("j=%d,l=%d\n",j,l);
+          if (ipp & 1) i^=iu[j-l][k];
+          ipp >>=1;
+        }
+        iu[j][k]=i;
+      }
+      //printf("in Sobseq,4\n"); 
+      
+    }
+    //printf("inital\n");
+  } else {
+    im = in++;
+    for (j=1;j<=MAXBIT;j++){
+      if(!(im&1)) break;
+      im>>=1;
+    }
+    if(j>MAXBIT) printf("Error: MAXBIT too small in sobseq");
+    im = (j-1)*MAXDIM;
+    if(*n <=MAXDIM){
+      for (k=1;k<=*n;k++){
+        ix[k] ^=iv[im+k];
+        x[k] = ix[k]*fac;
+      }
+    }
+  }
+}
+
 double Oblateness::Ran1_(long *idum)
 {
   int j;
@@ -260,16 +317,24 @@ void Oblateness::relativeFlux(double *phi, int np, double *smaarr, int ns, doubl
 	  }
 
 	  int Nrays;
-	  Nrays = 3000;
+	  Nrays = 1000;
 	  double eta1, eta2, theta, R, x, y;
 	  double contribution=0.0, separation1, separation2;
 	  double total=0.0;
-	
+    double *sobx=new double [3];
+    int sobn = -1;
     init = clock();
+    //printf("before initial\n");
+    Sobseq_(&sobn,sobx);
 	  for(int j=1; j<=Nrays; j++)
 	  {
-		  eta1 = Ran1_(&seed);
-		  eta2 = Ran1_(&seed);
+      sobn = 2;
+      Sobseq_(&sobn,sobx);
+      //printf("sobx=%f,%f\n",sobx[1],sobx[2]);
+		  //eta1 = Ran1_(&seed);
+		  //eta2 = Ran1_(&seed);
+      eta1 = sobx[1];
+      eta2 = sobx[2];
 		  theta = (1.0-eta2)*theta1+eta2*theta2;
 		  R = sqrt(eta1+(1-eta1)/epsilon2);
 		  x = Req_*R*cos(theta);
@@ -297,6 +362,7 @@ void Oblateness::relativeFlux(double *phi, int np, double *smaarr, int ns, doubl
 	  totalArea = dtheta*(Req_*Req_-Rpole_*Rpole_)*0.5/epsilon;
 	  Istar = contribution*totalArea/Nrays;
 	  deficitFlux[i] = (1.0-u1_-u2_)*F00+Istar;
+    delete [] sobx;
     //printf("%d %f %f %f %f\n", i, F00, contribution, xc,yc);
   }
   printf("three zones: %f %f %f\n",clc1,clc2,clc3);

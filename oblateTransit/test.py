@@ -80,8 +80,8 @@ def main():
     f = 0.1
     f2 = 0.1
     #alpha =45./180.*np.pi
-    alpha =21./180.*np.pi
-    alpha2 =90./180.*np.pi
+    alpha =45./180.*np.pi
+    alpha2 =45./180.*np.pi
     #sma = 8.924
     sma = 49.584
     #period = 2.218573 
@@ -110,7 +110,7 @@ def main():
     oblf = OblF.Oblateness(req2,rpol2,alpha2,sma,inc,u1,u2)
     print '0',time.time(),time.clock()-start
     b0 = sma*cos(inc)
-    print 'b0',b0,acos(b0)/np.pi*180.
+    #print 'b0',b0,acos(b0)/np.pi*180.
     if(b0>(1+req)):
         print 'no transit happen'
         return

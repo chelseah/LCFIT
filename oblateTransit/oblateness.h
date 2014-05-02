@@ -14,6 +14,7 @@ class Oblateness{
     void relativeFlux(double *phi, int np, double *smaarr, int ns, double *deficitFlux, int nf);
   private:
     double Ran1_(long *idum);
+    void Sobseq_(int *n, double x[]);
     double LimbDarkening_(double r2);
     void FindRoot_(double x1, double y1, double x2, double y2, double xc, double yc, double *xval, double *yval, int *flag);
     void IntersectionPoints_(double *x, double *y, int *n, double a, double b, double xc, double yc);
@@ -29,6 +30,8 @@ class Oblateness{
     static const int IQ=127773;
     static const int IR=2836;
     static const int NTAB=32;
+    static const int MAXBIT=30;
+    static const int MAXDIM=6;
 
 };
 #endif
