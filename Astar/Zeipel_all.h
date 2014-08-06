@@ -8,7 +8,7 @@ class Zeipel {
     ~Zeipel();
     //a in cgs/rsun, b is b*Rpole;
     void Cal_F(double *phase, int np, double *F, int nf,double theta, double a, double b);
-    void Cal_F0(double *F0);
+    void Cal_F0(double *F0,int np);
     double fx(double* x,int nx) ;
     int dimen() const {return kDimen_;}
   private:

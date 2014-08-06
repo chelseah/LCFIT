@@ -27,7 +27,7 @@ void Zeipel::Cal_F(double *phase, int np, double *F, int nf,double theta, double
     y[i] = -phase[i]*2.*pi_*a*sin(theta)+b*cos(theta);
   }
   Calgeff_(x,np,y,np,g,np);
-  Cal_F0(&F0);
+  Cal_F0(&F0,1);
   feff=Feff_();
   //printf("F0=%f,feff=%f\n",F0,feff);
   for (int i=0; i<np; i++){
@@ -39,7 +39,7 @@ void Zeipel::Cal_F(double *phase, int np, double *F, int nf,double theta, double
   return;
 }
 
-void Zeipel::Cal_F0(double *F0){
+void Zeipel::Cal_F0(double *F0,int np){
   double x1,x2,y1,y2;
   x1 = 0; x2 = Req_;
   y1 = 0; y2 = pi_*2.; 
@@ -152,7 +152,7 @@ double Zeipel::Integrate2D_(double x1, double x2, double y){
     double dx = xr*absc_[j];
     xm1[1] = xm+dx;
     xm2[1] = xm-dx;
-    s+=w_[j]*(fx(xm1) + fx(xm2));
+    s+=w_[j]*(fx(xm1,2) + fx(xm2,2));
   }
   delete [] xm1;
   delete [] xm2;

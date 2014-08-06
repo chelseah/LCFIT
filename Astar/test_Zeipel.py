@@ -2,8 +2,8 @@
 import quadpolar
 import quadsphere
 import ZeipelModel
-from Zeipel import Zeipel
-#from Zeipel_all import Zeipel
+#from Zeipel import Zeipel
+from Zeipel_all import Zeipel
 from occultquad import occultquad
 import numpy as np
 import scipy as sp
@@ -22,8 +22,8 @@ def testgd(b,phi,theta):
     rp = 0.1
     a = 0.05
     P = 3.04
-    #beta = 0.19
-    beta = 0.25
+    beta = 0.19
+    #beta = 0.25
     fratio = 0.1947
     Ms = 1.8
     Req = 2.029
@@ -68,10 +68,10 @@ def testgd(b,phi,theta):
     F0ratio = F0/gpole**(4.*beta)/(np.pi*Req**2.)
     print 'total Flux ratio along line of sight compare to piReq^2Tpole^4',F0ratio
     #use Zeiple to compute the luminosity, integrated over the 3-d luminosity
-    lum = gdmodel.Cal_Lum()
+    #lum = gdmodel.Cal_Lum()
     #the ratio of total lum compare to use the Teff at pole 
-    lumratio = lum/gpole**(4.*beta)/(4.*np.pi*Req**2.)  
-    print 'total luminosity compare to 4piReq^2Tpole^4',lumratio
+    #lumratio = lum/gpole**(4.*beta)/(4.*np.pi*Req**2.)  
+    #print 'total luminosity compare to 4piReq^2Tpole^4',lumratio
     #print lum/gpole**(4.*beta)/(4./3*np.pi*Req**3.)
     #correct the circular model
     model = (circularflux-max(circularflux))*F+1

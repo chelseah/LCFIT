@@ -1,10 +1,10 @@
 ELL_INTERFACES = elliptic.i
 ELL_SOURCES = elliptic.cc elliptic.h
 PROJECT = testquad
-OBJECT = testquad.o eggbox.o poly.o circle.o sphere.o quad.o quad2d.o quadpolar.o quad3d.o quadsphere.o Zeipelmodel.o Zeipel.o Laramodel.o Lara.o Laramodelfilter.o Larafilter.o 
+OBJECT = testquad.o eggbox.o poly.o circle.o sphere.o quad.o quad2d.o quadpolar.o quad3d.o quadsphere.o Zeipelmodel.o Zeipel.o Laramodel.o Lara.o Laramodelfilter.o Larafilter.o Zeipel_all.o 
 Poly_SOURCES = testquad.cc poly.cc poly.h model.h circle.cc circle.h sphere.cc sphere.h quad.cc quad.h quad2d.cc quad2d.h quadpolar.cc quadpolar.h quad3d.cc quad3d.h quadsphere.cc quadsphere.h integrator.h 
-ZEIPEL_SOURCES = quadpolar.cc quad2d.cc quadsphere.cc Zeipelmodel.cc Zeipel.cc Zeipelmodel.h Zeipel.h model.h quadpolar.h quad2d.h quadsphere.h integrator.h Laramodel.cc Laramodel.h Lara.cc Lara.h Laramodelfilter.cc Laramodelfilter.h Larafilter.cc Larafilter.h 
-ZEIPEL_INTERFACES =  quadpolar.i quad2d.i quadsphere.i Zeipelmodel.i Zeipel.i Laramodel.i Lara.i Laramodelfilter.i Larafilter.i 
+ZEIPEL_SOURCES = quadpolar.cc quad2d.cc quadsphere.cc Zeipelmodel.cc Zeipel.cc Zeipelmodel.h Zeipel.h model.h quadpolar.h quad2d.h quadsphere.h integrator.h Laramodel.cc Laramodel.h Lara.cc Lara.h Laramodelfilter.cc Laramodelfilter.h Larafilter.cc Larafilter.h Zeipel_all.cc Zeipel_all.h 
+ZEIPEL_INTERFACES =  quadpolar.i quad2d.i quadsphere.i Zeipelmodel.i Zeipel.i Laramodel.i Lara.i Laramodelfilter.i Larafilter.i Zeipel_all.i 
 SOURCES = $(ELL_SOURCES) $(ZEIPEL_SOURCES) 
 INTERFACES = $(ELL_INTERFACES) $(ZEIPEL_INTERFACES) 
 WRAPPERS = $(INTERFACES:.i=_wrap.cxx)

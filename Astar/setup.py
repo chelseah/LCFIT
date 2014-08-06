@@ -67,11 +67,11 @@ _Larafilter = Extension("_Larafilter",
         )
 
 
-#_Zeipel_all = Extension("_Zeipel_all",
-#        ["Zeipel_all_wrap.cxx",
-#            "Zeipel_all.cc"],
-#        include_dirs = [numpy_include],
-#        )
+_Zeipel_all = Extension("_Zeipel_all",
+        ["Zeipel_all_wrap.cxx",
+            "Zeipel_all.cc"],
+        include_dirs = [numpy_include],
+        )
 
 
 
@@ -81,5 +81,5 @@ setup(name="Oblate",
         author_email = "",
         url = "",
         version = "0.0.0",
-        py_modules = ["elliptic","quadpolar","quad2d","quadsphere","ZeipelModel","Zeipel","LaraModel","Lara","LaraModelfilter","Larafilter"],
-        ext_modules = [_elliptic,_quadpolar,_quad2d,_quadsphere,_ZeipelModel,_Zeipel,_LaraModel,_Lara,_LaraModelfilter,_Larafilter])
+        py_modules = ["elliptic","quadpolar","quad2d","quadsphere","ZeipelModel","Zeipel","LaraModel","Lara","LaraModelfilter","Larafilter","Zeipel_all"],
+        ext_modules = [_elliptic,_quadpolar,_quad2d,_quadsphere,_ZeipelModel,_Zeipel,_LaraModel,_Lara,_LaraModelfilter,_Larafilter,_Zeipel_all])
