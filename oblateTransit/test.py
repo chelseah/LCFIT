@@ -11,17 +11,17 @@ from matplotlib import pyplot as plt
 import time
 
 def Scaling():
-    #rmean = 0.1
-    rmeanarr = (1+np.arange(20))/20.*0.2
+    rmeanarr = np.array([0.1])
+    #rmeanarr = (1+np.arange(20))/20.*0.2
     period = 100.
     u1 = 0
     u2 = 0
     #f = 0.1
     #farr = (1+np.arange(5))/5.*0.2
-    farr = (1+np.arange(10))/10.*0.2
-    #farr = np.array([0.1])
-    #alphaarr =(np.arange(50)/50.*180.-90)
-    alphaarr = np.array([45])
+    #farr = (1+np.arange(10))/10.*0.2
+    farr = np.array([0.1])
+    alphaarr =(np.arange(101)/100.*180.-90)
+    #alphaarr = np.array([45])
     sma = (period/365)**(2./3.)*1.5e13/7.e10
     #inc = 89.709/180.*np.pi
     b0arr = -0.8+np.arange(101)/100.*1.6
@@ -29,7 +29,7 @@ def Scaling():
     #b0 = 0.8
     #b0 = sma*cos(inc)
     #print sma,b0
-    Npoint = 1000
+    Npoint = 5000
     percent = 0.025
     dflux = np.zeros(Npoint)
     dfluxF = np.zeros(Npoint)
@@ -153,5 +153,5 @@ def main():
     return
 
 if __name__=='__main__':
-    main()
-    #Scaling()
+    #main()
+    Scaling()

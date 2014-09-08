@@ -209,7 +209,7 @@ def GenLC(lcfile,transit):
         fkdflux = np.zeros(len(fragtime[fkintran]))
         #print req,rpol,transit.alpha,transit.sma,transit.inc,transit.u1,transit.u2
         obl = Obl.Oblateness(req,rpol,transit.alpha,transit.sma,transit.inc,transit.u1,transit.u2)
-        obl.relativeFlux(fkphase[fkintran],fkdflux)
+        obl.relativeFlux(fkphase[fkintran],1.+np.zeros(len(fkdflux)),fkdflux)
         #print fkphase[fkintran]
         circularfluxmean = occultquad(z,transit.u1,transit.u2,transit.rmean)[0]
         #plt.plot(fkphase,z)

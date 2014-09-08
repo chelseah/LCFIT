@@ -23,7 +23,7 @@ void Zeipel::Cal_F(double *phase, int np, double *F, int nf,double theta, double
   y = new double [np];
   g = new double [np];
   for (int i=0; i<np; i++){
-    x[i] = phase[i]*2.*pi_*a*cos(theta)-b*sin(theta);
+    x[i] = phase[i]*2.*pi_*a*cos(theta)+b*sin(theta);
     y[i] = -phase[i]*2.*pi_*a*sin(theta)+b*cos(theta);
   }
   Calgeff_(x,np,y,np,g,np);

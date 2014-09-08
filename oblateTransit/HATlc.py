@@ -82,7 +82,7 @@ class tran():
             self.stdmag = float(stdmag)
     def calLD(self):
         self.u1 = 2.*math.sqrt(self.q1)*self.q2
-        self.u2 = math.sqrt(self.q1)*(1-2*self.q2)
+        self.u2 = math.sqrt(self.q1)*(1-2.*self.q2)
         return
     def calq(self,rstar=1,logg=4.5):
         if(self.dip<=0):
