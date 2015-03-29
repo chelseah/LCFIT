@@ -7,13 +7,12 @@
 #include "quadsphere.h"
 class Zeipel {
   public: 
-    Zeipel(double fratio,double phi,double Req,  double ggraveq, double groteq, double beta);
+    Zeipel(double fratio,double phi,double Req,  double ggraveq, double groteq, double beta, double Rp);
     ~Zeipel();
     //a in cgs/rsun, b is b*Rpole;
     void Cal_F(double *phase, int np, double *F, int nf,double theta, double a, double b);
-    void Cal_F0(double *F0, int np);
+    void Cal_F0(double *F0);
     double Cal_Lum();
-    //void Cal_geff(double x);
     //double fx(double* x) ;
     //int dimen() const {return kDimen_;}
   private:

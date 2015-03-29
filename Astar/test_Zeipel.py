@@ -29,6 +29,7 @@ def testgd(b,phi,theta):
     Req = 2.029
     Rpole = Req*(1-fratio)
     Tpole = 8450
+    #Tpole = 5000
     u1 = 0.32; u2 = 0.32
     Protot = 8.64 
    

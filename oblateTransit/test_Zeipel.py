@@ -19,7 +19,7 @@ def testgd(b,phi,theta):
     #phi and theta should be in radiant
     
     #parameters match Barnes 2009
-    rp = 0.1
+    rp = 0.1 #in solar radius units
     a = 0.05
     P = 3.04
     beta = 0.19
@@ -52,7 +52,9 @@ def testgd(b,phi,theta):
     gpole = ggraveq0*Req**2./Rpole**2.
     #inite Zeipel 
     #Warning, use beta to init Zeipel, instead of y; F = g**(4*beta)
-    gdmodel = Zeipel(fratio,phi,Req,ggraveq0,groteq0,beta)
+    #gdmodel = Zeipel(fratio,phi,Req,ggraveq0,groteq0,beta)
+    #the rp pass to code should be in solar units, I think
+    gdmodel = Zeipel(fratio,phi,Req,ggraveq0,groteq0,beta,rp)
     F = np.zeros(len(phase))
     Rpole = Req*(1-fratio)
 
@@ -64,18 +66,19 @@ def testgd(b,phi,theta):
     print lum/gpole**(4.*beta)/(4.*np.pi*Req**3.)
     #correct the circular model
     model = (circularflux-max(circularflux))*F+1
-
+    #model = (circularflux-max(circularflux))+1
+    #model = F
     return model
 
 def main():
-    #barr = np.array([-0.9,-0.6,-0.3,0,0.3,0.6,0.9])
-    barr = np.array([-0.6,-0.3,0,0.3,0.6])
-    phi = 0.
-    #phi = 30./180.*math.pi
+    barr = np.array([-0.9,-0.6,-0.3,0,0.3,0.6,0.9])
+    #barr = np.array([-0.6,-0.3,0,0.3,0.6])
+    #phi = 0.
+    phi = 30./180.*math.pi
     theta = 0.
     #theta = 30./180.*math.pi
     #barr = np.array([0,0.3,0.6,0.9])
-    #barr = np.array([0.0])
+    #barr = np.array([0.9])
     for b in barr:
         model = testgd(b,phi,theta)
         plt.plot(model)

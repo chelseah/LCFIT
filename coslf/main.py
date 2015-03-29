@@ -60,7 +60,7 @@ def main():
         print 'use default outfile extention .ltf'
     elif not infile =='':
         namelist=[infile]
-
+    print inpath
     if not inpath=='':
         os.chdir(inpath)
 
@@ -76,7 +76,7 @@ def main():
         #dip = 0.00775
   
         #print np.mean(mag),np.mean(mag[intran]),np.mean(mag[-intran]),dip
-        
+        print name,coljd,time  
         n=round((max(time)-min(time))/tmin)
         if method == 'cos':
             dflux=lssubrecon(time,mag,intran,n=n,noplot=noplot)
@@ -90,7 +90,7 @@ def main():
         print outfile
         fout=open(outfile,mode='w')
         for i in range(len(time)):
-            line='%10.6f %10.6f\n' % (time[i],dflux[i])
+            line='%10.6f %10.6f %10.6f\n' % (time[i],dflux[i],dflux[i]-np.median(dflux))
             fout.write(line)
         fout.close()
     
